@@ -74,17 +74,17 @@ long int Flip(long int num)
 {
 
 	int temp = 0;
-	long int fin = 0;
+	long int final = 0;
 	
 	while(num > 10)
 	{
 		temp = (num % 10);
-		fin = (fin + temp) * 10;
+		final = (final + temp) * 10;
 		num = num / 10;
 	}
-	fin += num;
+	final += num;
 
-	return fin;
+	return final;
 }
 
 /******** Ex6- swap decleration ************/
