@@ -1,0 +1,7 @@
+# ignore all files, exept sorce and header files:
+*
+!/**/
+!**.c
+!**.h
+!.gitignore
+!**.md
