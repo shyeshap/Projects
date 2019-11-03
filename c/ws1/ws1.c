@@ -1,52 +1,39 @@
 #include <stdio.h>
 
-/********define functions*********/
+/********declare functions*********/
 float DecPow(int n);
-int Flip(int num);
+long int Flip(long int num);
 void Swap(int **x, int **y);
 
  							
 int main()
 {
-/****************************************************************************************
- *					Ex3              				*
- *			   hexadecimal value of char call				* 
- ****************************************************************************************/
-	printf("\nThis function prints out the hexadecimal value of Hello world\n\n");
+
+	printf("\nHexadecimal value of Hello world\n\n");
 	printf("the ascii of hello world is %x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x. %x\n", 		'\"', 'H', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd', '\"');
-	printf("which returns: %c%c%c%c%c%c%c%c%c%c%c%c%c\n\n", 0x22, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 		0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x22);
+	printf("which returns: %c%c%c%c%c%c%c%c%c%c%c%c%c\n\n", 
+		0x22, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x22);
 
 
-/****************************************************************************************
- *					Ex4						*
- *				  return 10^n call					*
- ****************************************************************************************/
-
-	int n;
-	printf("\nThis function will return 10^number\n");
+	int n = 0;
+	printf("10^number:\n");
 	printf("Insert the number: ");
 	scanf("%d", &n);
-	printf("%f\n\n", DecPow(n));
+	printf("10^%d = %f\n\n", n, DecPow(n));
 
-/****************************************************************************************
- *					Ex5						*
- *				   flip intiger call					*
- ****************************************************************************************/
-	printf("\nThis funtion will flip your number\n\n");
-	
-	int num;
+
+	printf("\nFlip\n\n");
+
+	long int num = 0;
 	printf("Insert an intiger to be flipped: ");
-	scanf("%d", &num);
-	printf("The flipped number is: %d\n\n", Flip(num));
+	scanf("%ld", &num);
+	printf("The flipped number is: %ld\n\n", Flip(num));
 
 
-/****************************************************************************************
- *					Ex6						*
- *				     swap call  					*
- ****************************************************************************************/
 
-	printf("This function will swap the location of two variabls\n\n");
-	int *px, *py, x, y;
+
+	printf("swap the location of two variabls:\n\n");
+	int *px, *py, x = 0, y = 0;
 	printf("Insert first value of a variablre to be swapped: ");
 	scanf("%d", &x);
 	printf("Insert second value of a variable to be swapped: ");
@@ -60,42 +47,34 @@ int main()
 }
 
 
-/****************************************************************************************
-*											*
-*					Ex4						*
-*			       return 10^n decleration 					*
-*											*
-*****************************************************************************************/
+/*******Ex4- return 10^n decleration********/
 
 float DecPow(int n)
 {
-	int i;
-	float d_pow = 1.0;
+	int i = 0;
+	float d_pow = 1.0, tmp = 10;
 	
 	if(n < 0)
 	{
-		d_pow = 1.0/n;
+		tmp = 1.0/tmp;
+		n = -n;
 	}
 	for(i = 0; i < n; i++)
 	{
-		d_pow *= 10.0;
+		d_pow *= tmp;
 	}	
 
 	return d_pow;
 }
 
 
-/****************************************************************************************
-*											*
-*					Ex5						*
-*			      flip intiger decleration					*
-*											*
-*****************************************************************************************/
+/******Ex5- flip intiger decleration********/
 
-int Flip(int num)
+long int Flip(long int num)
 {
 
-	int temp, fin = 0;
+	int temp = 0;
+	long int fin = 0;
 	
 	while(num > 10)
 	{
@@ -108,12 +87,7 @@ int Flip(int num)
 	return fin;
 }
 
-/****************************************************************************************
-*											*
-*					Ex6						*
-*				  swap decleration  					*
-*											*
-*****************************************************************************************/
+/******** Ex6- swap decleration ************/
 
 
 
