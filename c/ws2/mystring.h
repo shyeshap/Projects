@@ -7,41 +7,7 @@
 #include <stdlib.h>
 
 
-size_t mystrLen(const char *s);
-int MyStrCmp(const char *s1, const char *s2);
-char *MyStrCpy(char *dest, const char *src);
 
-int main()
-{
-	char s[] = "Hello world";
-	printf("the length of %s is %ld\n\n", s,mystrLen(s));
-	
-
-	/*test*/
-	char s1[] = "ac";
-	char s2[] = "A";
-	char s3[] = "";
-	char s4[] = "achg";
-	printf("%d\n", strcmp(s1, s4));
-	printf("%d\n", strcmp(s1, s2));
-	printf("%d\n\n", strcmp(s2, s1));
-	
-	printf("%d\n", MyStrCmp(s1, s4));
-	printf("%d\n", MyStrCmp(s1, s2));
-	printf("%d\n\n", MyStrCmp(s2, s1));
-	
-	printf("%s\n", strcpy(s1, s2));
-	printf("%s\n", strcpy(s1, s3));
-	printf("%s\n\n", strcpy(s1, s4));
-
-	printf("%s\n", MyStrCpy(s1, s2));
-	printf("%s\n", MyStrCpy(s1, s3));
-	printf("%s\n", MyStrCpy(s1, s4));
-	
-	
-	
-	return 0;
-}
 
 /****strlen******/
 
@@ -80,7 +46,7 @@ char *MyStrCpy(char *dest, const char *src)
 {
 	assert(NULL != dest && NULL != src);
 	
-	char *runner = dest;
+	char *destination = dest;
 
 	while('\0' != *src)
 	{
@@ -91,6 +57,30 @@ char *MyStrCpy(char *dest, const char *src)
 	
 	*dest = '\0';
 		
-	return runner;
+	return destination;
 }
+
+
+/*******strncpy**********/
+
+char *strncpy(char *dest, const char *src, size_t n)
+{
+	assert(NULL != dest && NULL != src);
 	
+	char *destination = dest;
+
+	while(*dest < n)
+	{
+		if ('\0' == *src)
+		{
+			*dest = '\0';
+		}
+		*dest = *src;
+		++src;
+		++dest;
+	}
+	
+	*dest = '\0';
+		
+	return destination;
+}

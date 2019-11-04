@@ -1,10 +1,15 @@
+/* Worksheet2 - Exercise
+	string.h */
 
-#include <mystring.h>
-
+#include <stdio.h>
+#include <assert.h>
+#include <string.h>
+#include <stdlib.h>
 
 size_t mystrLen(const char *s);
 int MyStrCmp(const char *s1, const char *s2);
 char *MyStrCpy(char *dest, const char *src);
+char *strncpy(char *dest, const char *src, size_t n);
 
 int main()
 {
