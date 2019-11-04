@@ -34,45 +34,55 @@ int main()
 	char *c3 = "b";
 	char *c4 = "";
 	
+	printf("mystrlen\n");
 	printf("the length of %s is %ld\n\n", s,mystrLen(s));
 	
 	/*test strcmp*/
+	printf("***strcmp***\n");
 	printf("%d\n", strcmp(s1, s4));
 	printf("%d\n", strcmp(s1, s2));
 	printf("%d\n\n", strcmp(s2, s1));
 	
+	printf("***mystrcmp***\n");
 	printf("%d\n", MyStrCmp(s1, s4));
 	printf("%d\n", MyStrCmp(s1, s2));
 	printf("%d\n\n", MyStrCmp(s2, s1));
 	
 	/*test strcpy*/
+	printf("***strcpy***\n");
 	printf("%s\n", strcpy(s1, s2));
 	printf("%s\n", strcpy(s1, s3));
 	printf("%s\n\n", strcpy(s1, s4));
 
-
+	printf("***mystrcmp***\n");
 	printf("%s\n", MyStrCpy(b1, b2));
 	printf("%s\n", MyStrCpy(b1, b3));
 	printf("%s\n\n", MyStrCpy(b1, b4));
 	
 	/*test strncmp*/
 	
-	
+	printf("***strncmp***\n");
 	printf("%s\n", strncpy(c1, c2, 2));
 	printf("%s\n", strncpy(c1, c3, 0));
 	printf("%s\n\n", strncpy(c1, c4, 6));
 
-	
+	printf("***mystrncmp***\n");
 	printf("%s\n", mystrncpy(c1, c2, 2));
 	printf("%s\n", mystrncpy(c1, c3, 0));
 	printf("%s\n\n", mystrncpy(c1, c4, 6));
 
     /*test strchr*/
-    
+    printf("***strchr***\n");
 	printf("%s\n", strchr(s1, 'o'));
 	printf("%s\n", strchr(s1, 'p'));
 	printf("%s\n\n", strchr(s1, 'a'));
 	
+	printf("***strchr***\n");
+	printf("%s\n", strchr(s1, 'o'));
+	printf("%s\n", strchr(s1, 'p'));
+	printf("%s\n\n", strchr(s1, 'a'));
+	
+	printf("***mystrchr***\n");
 	printf("%s\n", mystrchr(s1, 'o'));
 	printf("%s\n", mystrchr(s1, 'p'));
 	printf("%s\n\n", mystrchr(s1, 'a'));

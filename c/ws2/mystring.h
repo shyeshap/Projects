@@ -15,7 +15,7 @@ size_t mystrLen(const char *s)
 {
 	const char *runner = s;
 	
-	assert(NULL != s); /**/
+	assert(NULL != s); /*WARNING! Can not reciev NULL pointer to s*/
 
 	while ('\0' != *runner)
 	{
@@ -30,7 +30,7 @@ int MyStrCmp(const char *s1, const char *s2)
 {
 	const char *runner1 = s1, *runner2 = s2;
 	
-	assert(NULL != s1 && NULL != s2); /**/
+	assert(NULL != s1 && NULL != s2); /*WARNING! Can not reciev NULL pointer to s1 and s2*/
 
 	while (*runner1 == *runner2 && '\0' != *runner1)
 		{
@@ -46,7 +46,7 @@ char *MyStrCpy(char *dest, const char *src)
 {
 	char *destination = dest;
 	
-	assert(NULL != dest && NULL != src); /**/
+	assert(NULL != dest && NULL != src); /*WARNING! Can not reciev NULL pointer to dest snd src*/
 
 	while ('\0' != *src)
 	{
@@ -68,7 +68,7 @@ char *mystrncpy(char *dest, const char *src, size_t n)
 	char *runner = dest;
 	size_t i = 0;
 	
-	assert(NULL != dest && NULL != src); /**/
+	assert(NULL != dest && NULL != src); /*WARNING! Can not reciev NULL pointer to dest and src*/
 
 	for(i = 0; i < n; i++)
 	{
@@ -86,7 +86,7 @@ int mystrcasecmp(const char *s1, const char *s2)
 {
 	const char *runner1 = s1, *runner2 = s2;
 	
-	assert(NULL != s1 && NULL != s2); /**/ 
+	assert(NULL != s1 && NULL != s2); /*WARNING! Can not reciev NULL pointer to s1 and s2*/ 
 
 	while (tolower(*runner1) == tolower(*runner2) && '\0' != *runner1)
 		{
@@ -103,7 +103,7 @@ char *mystrchr(const char *s, int c)
 {
 	const char *runner = s;
 	
-	assert(NULL != s); /**/
+	assert(NULL != s); /*WARNING! Can not reciev NULL pointer to s*/
 	
 	while (*runner!= c)
 	{
