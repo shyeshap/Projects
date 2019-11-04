@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
-#include <mystring.h>
+#include "mystring.h"
 
 size_t mystrLen(const char *s);
 int MyStrCmp(const char *s1, const char *s2);
@@ -18,12 +18,23 @@ char *strchr(const char *s, int c);
 int main()
 {
 	char s[] = "Hello world";
-	printf("the length of %s is %ld\n\n", s,mystrLen(s));
 	
 	char s1[] = "ac";
 	char s2[] = "A";
 	char s3[] = "";
 	char s4[] = "achg";
+	
+	char b1[] = "ac";
+	char b2[] = "A";
+	char b3[] = "";
+	char b4[] = "achg";
+	
+	char *c1 = "comp";
+	char *c2 = "CO!MP";
+	char *c3 = "b";
+	char *c4 = "";
+	
+	printf("the length of %s is %ld\n\n", s,mystrLen(s));
 	
 	/*test strcmp*/
 	printf("%d\n", strcmp(s1, s4));
@@ -39,19 +50,13 @@ int main()
 	printf("%s\n", strcpy(s1, s3));
 	printf("%s\n\n", strcpy(s1, s4));
 
-	char b1[] = "ac";
-	char b2[] = "A";
-	char b3[] = "";
-	char b4[] = "achg";
+
 	printf("%s\n", MyStrCpy(b1, b2));
 	printf("%s\n", MyStrCpy(b1, b3));
 	printf("%s\n\n", MyStrCpy(b1, b4));
 	
 	/*test strncmp*/
-	char *c1 = "comp";
-	char *c2 = "CO!MP";
-	char *c3 = "b";
-	char *c4 = "";
+	
 	
 	printf("%s\n", strncpy(c1, c2, 2));
 	printf("%s\n", strncpy(c1, c3, 0));
@@ -63,7 +68,7 @@ int main()
 	printf("%s\n\n", mystrncpy(c1, c4, 6));
 
     /*test strchr*/
-    char *a1 = "comp";
+    
 	printf("%s\n", strchr(s1, 'o'));
 	printf("%s\n", strchr(s1, 'p'));
 	printf("%s\n\n", strchr(s1, 'a'));

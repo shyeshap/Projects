@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <ctype.h>
 
 
 
@@ -13,8 +13,9 @@
 
 size_t mystrLen(const char *s) 
 {
-	assert(NULL != s);
 	const char *runner = s;
+	
+	assert(NULL != s); /**/
 
 	while ('\0' != *runner)
 	{
@@ -27,10 +28,9 @@ size_t mystrLen(const char *s)
 
 int MyStrCmp(const char *s1, const char *s2)
 {
-	assert(NULL != s1 && NULL != s2);
-	
 	const char *runner1 = s1, *runner2 = s2;
-	int i = 0;
+	
+	assert(NULL != s1 && NULL != s2); /**/
 
 	while (*runner1 == *runner2 && '\0' != *runner1)
 		{
@@ -44,9 +44,9 @@ int MyStrCmp(const char *s1, const char *s2)
 
 char *MyStrCpy(char *dest, const char *src)
 {
-	assert(NULL != dest && NULL != src);
-	
 	char *destination = dest;
+	
+	assert(NULL != dest && NULL != src); /**/
 
 	while ('\0' != *src)
 	{
@@ -65,10 +65,11 @@ char *MyStrCpy(char *dest, const char *src)
 
 char *mystrncpy(char *dest, const char *src, size_t n)
 {
-	assert(NULL != dest && NULL != src);
-	
 	char *runner = dest;
-    	int i = 0;
+	size_t i = 0;
+	
+	assert(NULL != dest && NULL != src); /**/
+
 	for(i = 0; i < n; i++)
 	{
 	*runner = src[i];
@@ -83,9 +84,9 @@ char *mystrncpy(char *dest, const char *src, size_t n)
 
 int mystrcasecmp(const char *s1, const char *s2)
 {
-	assert(NULL != s1 && NULL != s2);
+	const char *runner1 = s1, *runner2 = s2;
 	
-	const char *runner1 = s1, *runner2 = s2; 
+	assert(NULL != s1 && NULL != s2); /**/ 
 
 	while (tolower(*runner1) == tolower(*runner2) && '\0' != *runner1)
 		{
@@ -98,17 +99,25 @@ int mystrcasecmp(const char *s1, const char *s2)
 
 /********strchr**********/
 
-char *strchr(const char *s, int c)
+char *mystrchr(const char *s, int c)
 {
-	assert(NULL != s);
-	
 	const char *runner = s;
+	
+	assert(NULL != s); /**/
 	
 	while (*runner!= c)
 	{
 		++runner;
 	}
-	return runner;
+	return (char *)runner;
 }
+
+
+
+
+
+
+
+
 
 
