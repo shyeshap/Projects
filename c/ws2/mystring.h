@@ -63,24 +63,18 @@ char *MyStrCpy(char *dest, const char *src)
 
 /*******strncpy**********/
 
-char *strncpy(char *dest, const char *src, size_t n)
+char *mystrncpy(char *dest, const char *src, size_t n)
 {
 	assert(NULL != dest && NULL != src);
 	
-	char *destination = dest;
-
-	while(*dest < n)
+	char *runner = dest;
+    int i = 0;
+	for(i = 0; i < n; i++)
 	{
-		if ('\0' == *src)
-		{
-			*dest = '\0';
-		}
-		*dest = *src;
-		++src;
-		++dest;
+	*runner = src[i];
+	++runner;
 	}
 	
-	*dest = '\0';
 		
-	return destination;
+	return dest;
 }
