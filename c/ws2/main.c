@@ -7,12 +7,6 @@
 #include <stdlib.h>
 #include "mystring.h"
 
-size_t mystrLen(const char *s);
-int MyStrCmp(const char *s1, const char *s2);
-char *MyStrCpy(char *dest, const char *src);
-char *strncpy(char *dest, const char *src, size_t n);
-int mystrcasecmp(const char *s1, const char *s2);
-char *strchr(const char *s, int c);
 
 
 int main()
@@ -29,11 +23,7 @@ int main()
 	char b3[] = "";
 	char b4[] = "achg";
 	
-	char *c1 = "comp";
-	char *c2 = "CO!MP";
-	char *c3 = "b";
-	char *c4 = "";
-	
+
 	printf("mystrlen\n");
 	printf("the length of %s is %ld\n\n", s,mystrLen(s));
 	
@@ -54,22 +44,22 @@ int main()
 	printf("%s\n", strcpy(s1, s3));
 	printf("%s\n\n", strcpy(s1, s4));
 
-	printf("***mystrcmp***\n");
+	printf("***mystrcpy***\n");
 	printf("%s\n", MyStrCpy(b1, b2));
 	printf("%s\n", MyStrCpy(b1, b3));
 	printf("%s\n\n", MyStrCpy(b1, b4));
 	
-	/*test strncmp*/
+	/*test strncpy*/
 	
-	printf("***strncmp***\n");
-	printf("%s\n", strncpy(c1, c2, 2));
-	printf("%s\n", strncpy(c1, c3, 0));
-	printf("%s\n\n", strncpy(c1, c4, 6));
+	printf("***strncpy***\n");
+	printf("%s\n", strncpy("abc", "ab", 2));
+	printf("%s\n", strncpy("abcd", "2", 0));
+	printf("%s\n\n", strncpy("a", "12345", 1));
 
-	printf("***mystrncmp***\n");
-	printf("%s\n", mystrncpy(c1, c2, 2));
-	printf("%s\n", mystrncpy(c1, c3, 0));
-	printf("%s\n\n", mystrncpy(c1, c4, 6));
+	printf("***mystrncpy***\n");
+	printf("%s\n", mystrncpy("abc", "ab", 2));
+	printf("%s\n", mystrncpy("abcd", "2", 0));
+	printf("%s\n\n", mystrncpy("a", "12345", 1));
 
     /*test strchr*/
     printf("***strchr***\n");
