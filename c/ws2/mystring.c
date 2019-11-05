@@ -11,7 +11,7 @@
 
 /****strlen******/
 
-size_t mystrLen(const char *s) 
+size_t MyStrLen(const char *s) 
 {
 	const char *runner = s;
 	
@@ -65,7 +65,7 @@ char *MyStrCpy(char *dest, const char *src)
 
 /*******strncpy**********/
 
-char *mystrncpy(char *dest, const char *src, size_t n)
+char *MyStrNCpy(char *dest, const char *src, size_t n)
 {
 	char *runner = dest;
 	size_t i = 0;
@@ -85,7 +85,7 @@ char *mystrncpy(char *dest, const char *src, size_t n)
 
 /*********strcasecmp*******/
 
-int mystrcasecmp(const char *s1, const char *s2)
+int MystrCaseCmp(const char *s1, const char *s2)
 {
 	const char *runner1 = s1, *runner2 = s2;
 	
@@ -103,7 +103,7 @@ int mystrcasecmp(const char *s1, const char *s2)
 
 /********strchr**********/
 
-char *mystrchr(const char *s, int c)
+char *MyStrChr(const char *s, int c)
 {
 	const char *runner = s;
 	
@@ -115,5 +115,26 @@ char *mystrchr(const char *s, int c)
 	}
 	return (char *)runner;
 }
+
+/*********strdup**********/
+
+ char *MyStrDup(const char *s)
+{
+	char *runner, *copy;
+	runner = (char *) malloc (sizeof(char*) * strlen(s));
+	copy = runner;
+	
+	assert(NULL != s); /*WARNING! Can not reciev NULL pointer to s*/
+	
+	while('\0' != *runner)
+	{
+		*runner = *s;
+		++runner;
+		++s;
+	}
+	return copy;
+	
+}
+
 
 
