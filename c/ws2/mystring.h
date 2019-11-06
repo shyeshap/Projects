@@ -20,7 +20,8 @@
  
  char *MyStrDup(const char *s);
 
-
-
+ char *MyStrCat(char *dest, const char *src);
+ 
+char *MyStrNCat(char *dest, const char *src, int n);
 
 #endif
