@@ -1,28 +1,24 @@
 
 /******WS3 - Environment********/
-
+/*copy and print environment variables in lowercase*/
 
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stddef.h>
+#include <stdlib.h> /*NULL macro*/
+#include <string.h> /*strlen*/
 #include <ctype.h> /*tolower*/
-#include <assert.h>
+#include <assert.h> /*assert*/
 #include "Env.h"
 
 
-#define ARRAYSIZE(x) (sizeof x/sizeof x[0])
-
-
-
+/*same as strdup*/
 char *MyStrDup(const char* s)
 {
     int str_size = strlen(s) + 1;
-   
     char *temp = (char*)malloc(sizeof(char) * str_size);
-   
     const char *runner = s;
+    
+    
     assert(NULL != s);
     assert(NULL != temp);
    
@@ -37,11 +33,14 @@ char *MyStrDup(const char* s)
    
 }
 
+/*countin pointers in an array*/
 size_t EnvpLines(const char **envp)
 {
 	int count = 0;
 	const char **runner;
 	runner = envp;
+	
+	assert (NULL != envp);
 	
 	while (NULL != *runner)
 	{
@@ -51,9 +50,13 @@ size_t EnvpLines(const char **envp)
 	return count;
 }
 
+/*turn strings to lowercase*/
 void ToLower(char *str)
 { 
 	char *runner = str;
+	
+	assert (NULL != str);
+	
 	while('\0' != *runner)
 	{
 		*runner = tolower(*runner);
@@ -61,8 +64,12 @@ void ToLower(char *str)
 	}
 }
 
+/*print out strings*/
 void PrintEnv(char **env)
 { 
+
+	assert (NULL != env);
+	
     while (NULL != *env)
     {
         printf("%s\n", *env); 
@@ -70,20 +77,24 @@ void PrintEnv(char **env)
     } 
 }
  
+/*free allocated memoryarrays*/
 void CleanEnvCopy(char **envp_cpy)
 {
 	int i = 0;
-	while (NULL != envp_cpy + i)
+	
+	assert (NULL != envp_cpy);
+	
+	while (*(envp_cpy + i))
 	{
 		free(*(envp_cpy +i));
-		*(envp_cpy + 1) = NULL;
+		*(envp_cpy + i) = NULL;
 		++i;
 	}
 	free (envp_cpy);
 	envp_cpy = NULL;		
 }
 
-
+/*copy and print environment variables in lowercase*/
 char **CpyEnv(const char **envp)
 
 {
@@ -93,11 +104,11 @@ char **CpyEnv(const char **envp)
 	char **envp_cpy = NULL;
 	char **head = envp_cpy;
 	runner = envp;
-	
 	count = EnvpLines(envp);
-	
 	envp_cpy = (char**) calloc (count, sizeof(char *));
 	head = envp_cpy;
+	
+	assert (NULL != envp_cpy);
 	
 	while (i < count)
 	{ 

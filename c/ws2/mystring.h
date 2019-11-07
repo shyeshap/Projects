@@ -1,9 +1,11 @@
 /* Worksheet2 - Exercise
 	string.h */
-#include <stdio.h>
 
 #ifndef _mystring_h
 #define _mystring_h
+
+#include <stdio.h>
+#include <stddef.h>
 
 
  size_t MyStrLen(const char *s);

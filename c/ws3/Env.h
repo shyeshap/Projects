@@ -1,14 +1,18 @@
-#include <stdio.h>
+/******WS3 - Environment********/
+/*copy and print environment variables in lowercase*/
 
 #ifndef _mystring_h
 #define _mystring_h
 
-void PrintEnv(char **env);
+#include <stdio.h>
 
-size_t EnvpLines(const char **envp);
+/**************************
+Shye Shapira
+nov 7, 2019
+reviewer: Daniel Ifrah
+****************************/
 
 char **CpyEnv(const char **envp);
 
-void ToLower(char *str);
-
 #endif
+
