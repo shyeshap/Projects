@@ -10,14 +10,51 @@
 #include <assert.h> /*assert*/
 #include "Env.h"
 
+/*reassurence of allocation*/
+void *MyMalloc(size_t size, int fall)
+{
+	if (0 == fall)
+	{
+		return NULL;
+		printf("ERROR");
+	}
+	else
+	{
+		return (void *) malloc (size);
+	}
+}
 
-/*same as strdup*/
-char *MyStrDup(const char* s)
+
+char *MyStrCpyToLower(char *dest, const char *src)
+{
+	char *destination = dest;
+	
+	assert(NULL != dest && NULL != src); /*WARNING! Can not reciev NULL pointer 
+						to dest snd src*/
+
+	while ('\0' != *src)
+	{
+		*dest = tolower(*src);
+		++src;
+		++dest;
+	}
+	
+	*dest = '\0';
+		
+	return destination;
+}
+
+/*same as strdup wit tolower*/
+char *MyStrDupLower(const char* s)
 {
     int str_size = strlen(s) + 1;
-    char *temp = (char*)malloc(sizeof(char) * str_size);
     const char *runner = s;
-    
+    char *temp = (char*) MyMalloc ((sizeof(char) * str_size), 1); /*insert 0 to 
+    									reassure simulate allocation faileure;*/
+    if(temp == NULL)
+    {
+    	return NULL;
+    }
     
     assert(NULL != s);
     assert(NULL != temp);
@@ -27,18 +64,18 @@ char *MyStrDup(const char* s)
         return NULL;
     }
    
-    strcpy(temp, runner);
+    MyStrCpyToLower(temp, runner);
        
     return temp;
    
 }
 
+
 /*countin pointers in an array*/
 size_t EnvpLines(const char **envp)
 {
 	int count = 0;
-	const char **runner;
-	runner = envp;
+	const char **runner = envp;
 	
 	assert (NULL != envp);
 	
@@ -47,27 +84,14 @@ size_t EnvpLines(const char **envp)
 		++runner;
 		++count;
 	}
-	return count;
+	return count-1;
 }
 
-/*turn strings to lowercase*/
-void ToLower(char *str)
-{ 
-	char *runner = str;
-	
-	assert (NULL != str);
-	
-	while('\0' != *runner)
-	{
-		*runner = tolower(*runner);
-		++runner;
-	}
-}
+
 
 /*print out strings*/
 void PrintEnv(char **env)
 { 
-
 	assert (NULL != env);
 	
     while (NULL != *env)
@@ -94,9 +118,10 @@ void CleanEnvCopy(char **envp_cpy)
 	envp_cpy = NULL;		
 }
 
-/*copy and print environment variables in lowercase*/
-char **CpyEnv(const char **envp)
 
+/*copy and print environment variables in lowercase*/
+
+void CpyEnv(const char **envp)
 {
 	
 	int count = 0, i = 0;
@@ -106,14 +131,23 @@ char **CpyEnv(const char **envp)
 	runner = envp;
 	count = EnvpLines(envp);
 	envp_cpy = (char**) calloc (count, sizeof(char *));
+	if(envp_cpy == NULL)
+    {
+    	printf("allocation failed");
+    }
 	head = envp_cpy;
 	
 	assert (NULL != envp_cpy);
 	
 	while (i < count)
 	{ 
-		*envp_cpy = MyStrDup(*runner);
-		ToLower(*envp_cpy);
+		*envp_cpy = MyStrDupLower(*runner);
+		if (*envp_cpy == NULL)
+		{
+			printf("allocation failed\n");
+			CleanEnvCopy(head);
+			return;
+		}
 		++runner;
 		++envp_cpy;
 		++i;
@@ -121,9 +155,6 @@ char **CpyEnv(const char **envp)
 	PrintEnv(head);
 	
 	CleanEnvCopy(head);
-	
-	return head;
-	
 }
 
 	

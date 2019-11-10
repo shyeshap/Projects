@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 
-int Josephus(int solds_num);
+
+int Jos(char *arr, int start);
 
 #endif

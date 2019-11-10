@@ -12,7 +12,7 @@ nov 7, 2019
 reviewer: Daniel Ifrah
 ****************************/
 
-char **CpyEnv(const char **envp);
+void CpyEnv(const char **envp);
 
 #endif
 
