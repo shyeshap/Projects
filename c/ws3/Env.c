@@ -29,8 +29,7 @@ char *MyStrCpyToLower(char *dest, const char *src)
 {
 	char *destination = dest;
 	
-	assert(NULL != dest && NULL != src); /*WARNING! Can not reciev NULL pointer 
-						to dest snd src*/
+	assert(NULL != dest && NULL != src); /*WARNING! Can not reciev NULL pointer*/
 
 	while ('\0' != *src)
 	{
@@ -50,7 +49,9 @@ char *MyStrDupLower(const char* s)
     int str_size = strlen(s) + 1;
     const char *runner = s;
     char *temp = (char*) MyMalloc ((sizeof(char) * str_size), 1); /*insert 0 to 
-    									reassure simulate allocation faileure;*/
+    								reassure simulate allocation faileure;*/
+    assert(NULL != char);/*WARNING! Can not reciev NULL pointer */
+    
     if(temp == NULL)
     {
     	return NULL;
@@ -77,7 +78,7 @@ size_t EnvpLines(const char **envp)
 	int count = 0;
 	const char **runner = envp;
 	
-	assert (NULL != envp);
+	assert (NULL != envp); /*WARNING! Can not reciev NULL pointer */
 	
 	while (NULL != *runner)
 	{
@@ -106,7 +107,7 @@ void CleanEnvCopy(char **envp_cpy)
 {
 	int i = 0;
 	
-	assert (NULL != envp_cpy);
+	assert (NULL != envp_cpy); /*WARNING! Can not reciev NULL pointer */
 	
 	while (*(envp_cpy + i))
 	{
@@ -115,7 +116,8 @@ void CleanEnvCopy(char **envp_cpy)
 		++i;
 	}
 	free (envp_cpy);
-	envp_cpy = NULL;		
+	envp_cpy = NULL;
+	printf("Cleanup successful");		
 }
 
 
@@ -130,6 +132,7 @@ void CpyEnv(const char **envp)
 	char **head = envp_cpy;
 	runner = envp;
 	count = EnvpLines(envp);
+	
 	envp_cpy = (char**) calloc (count, sizeof(char *));
 	if(envp_cpy == NULL)
     {
@@ -137,7 +140,7 @@ void CpyEnv(const char **envp)
     }
 	head = envp_cpy;
 	
-	assert (NULL != envp_cpy);
+	assert (NULL != envp_cpy); /*WARNING! Can not reciev NULL pointer */
 	
 	while (i < count)
 	{ 
