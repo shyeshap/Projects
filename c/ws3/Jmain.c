@@ -13,19 +13,11 @@ int main()
 	
 	while(i<101)
 	{
-	arr[i] = 'L';
-	++i;
+		arr[i] = 'L';
+		++i;
 	}
 	
 	printf("%d\n", Jos(ptr_arr, 1));
-	
-/*	while(j<i)
-	{
-	
-	printf("Soldier %d, %c \n",j+1,arr[j]);
-	++j;
-	}
-	*/
 
 return 0;
 }

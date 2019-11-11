@@ -7,7 +7,6 @@
 
 char *EndCheck(char *sword, char *arr)
 {
-	
 	if(*sword == '\0' || *(sword+1) == '\0')
 	{
 		sword = arr;
@@ -17,7 +16,6 @@ char *EndCheck(char *sword, char *arr)
 		++sword;
 	}
 
-	
 	return sword;
 }
 	
@@ -25,7 +23,6 @@ char *EndCheck(char *sword, char *arr)
 char *MoveToNext(char *sword, char *arr)
 {
 	sword = EndCheck(sword, arr);
-	
 
 	while (*sword == 'D')
 	{
@@ -35,8 +32,6 @@ char *MoveToNext(char *sword, char *arr)
 			sword = arr;
 		}
 	}
-	
-
 	
 	return sword;
 }
