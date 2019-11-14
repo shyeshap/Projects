@@ -9,6 +9,7 @@
 #include <stddef.h>
 
 #define MAX_STR_LEN 1000 /*cant receiv longer strings*/
+#define MAX_FILE_LEN 100 /*maximum length of file name*/
 #define ELEMEN_NUM 5 /*elements of array*/
 #define UNUSED(var) (void)(var)
 

@@ -10,11 +10,15 @@
 int main()
 {
 
+char file[MAX_FILE_LEN];
 match arr[ELEMEN_NUM];
 
 InitializArr(arr);
 
-InfraStruct("text.txt", arr);
+printf("plesae enter file's full name:\n");
+scanf("%s%*c", file);
+
+InfraStruct(file, arr);
 
 return 0;
 }

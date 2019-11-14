@@ -24,7 +24,6 @@ ChecknReturn AppendLine(const char *file, const char *str)
 	}
 	
 	fputs(str, fp);
-	fclose(fp);
 	close = fclose(fp);
 	if (0 != close)
 	{
@@ -130,7 +129,6 @@ ChecknReturn CopyFile(const char *file, const char *cpyfile)
 		return FAILTOCLOSE;
 	}
 	
-	
 	return SUCCESS;
 }
 
@@ -138,17 +136,12 @@ ChecknReturn CopyFile(const char *file, const char *cpyfile)
 ChecknReturn PrependLine(const char *file, const char *str)
 {
 	char *cpyfile =  "/tmp/tmpfile.txt";
-	FILE *oldfile = NULL, *newfile = NULL;
+	FILE *oldfile = NULL;
 	int close = 0, rem = 0;
 	
 	assert(NULL != file);
 	assert(NULL != str);
-	
-	newfile = fopen(cpyfile, "a");
-	if (newfile == NULL)
-	{
-		return FAILTOOPEN;
-	}
+
 	oldfile = fopen(file, "r");
 	if (oldfile == NULL)
 	{
@@ -157,15 +150,10 @@ ChecknReturn PrependLine(const char *file, const char *str)
 	
 	AppendLine(cpyfile, str + 1);
 	CopyFile(file, cpyfile);
-	fclose(fopen(file, "w"));
+	fclose(oldfile);
+	fopen(file, "w");
 	CopyFile(cpyfile, file);
 
-	close = fclose(newfile);
-	if (0 != close)
-	{
-		return FAILTOCLOSE;
-	}
-	fclose(oldfile);
 	close = fclose(oldfile);
 	if (0 != close)
 	{
@@ -252,19 +240,19 @@ match *InitializArr(match *arr)
 	return arr;
 }
 
+
 /***main body of program***/
 void InfraStruct(const char *file, match arr[])
 {
 	int ret = 0, i = 0;
 	char in[MAX_STR_LEN];
 	
-	
 	while (TERMINATE != ret)
 	{
 		printf("string or op: ");
 		fgets(in, MAX_STR_LEN, stdin);
 	
-		for (i = 0; i < 5; i++)
+		for (i = 0; i < ELEMEN_NUM; i++)
 		{
 			if (SUCCESS == arr[i].cmp(in, arr[i].str))
 			{
