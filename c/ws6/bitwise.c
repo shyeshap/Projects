@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
+
+#include "bitwise.h" 
 
 /***Ex1***/
-
 long Pow2(unsigned int x, unsigned int y)
 {
 	return x << y;
@@ -57,84 +59,155 @@ int PlusOne(int x)
 }
 
 /***Ex4***/
-int ThreeBitsOn(unsigned int *arr)
+void Print3BitsInt(unsigned int *arr)
 {
-	for (i = 0; 32 > i; ++i)
-	{
-		sum += arr[i] % 2
-}
-
-int Esc()
-{
-	return 0;
-}
-int main()
-{
-	unsigned int x = 0, y = 0 ,ans = 0;
-	int choose = 0, esc = 1, x1;
-
-	printf("\
-		1 -	Pow2\n\
-		2 -	LoopIsPow2\n\
-		3 -	IsPow2\n\
-		4 -	PlusOne\n\
-		5 -		\n\
-		6 -		\n\
-		8 -		\n\
-		9 -		\n\
-		10 -	\n\
-		11 -	\n\
-		12 - 	\n\
-		13 - 	\n\
-		14 - 	\n\
-		15 - 	\n\
-		16 - 	exit\n");
-		
-	while (esc)
-	{
-	printf("\nChoose number of program to run: ");
-	scanf("%d", &choose);
+	int i = 0, count = 0, n = 0;
+	unsigned int cpy_i = 0;
+	n = sizeof(arr) / sizeof(unsigned int) + 1;
 	
-	switch (choose)
+	for (i = 0; i < n; ++i)
 	{
-		case 1:
+		cpy_i = arr[i];
+		while ((cpy_i > 0) & (count <= 3))
 		{
-			printf("insert x: ");
-			scanf("%u", &x);
-			printf("Insert y: ");
-			scanf("%u", &y);
-			ans = Pow2(x, y);
-			printf("%u\n", ans);
-			break;
+			count += (cpy_i & 1);
+			cpy_i >>= 1;
 		}
-		case 2:
+		if (count == 3)
 		{
-			printf("Insert a number to chek if it is a power of 2: "); 
-			scanf("%u", &x);
-			printf("%d\n", LoopIsPow2(x));
-			break;
-		}	
-		case 3:
-		{
-			printf("Insert a number to chek if it is a power of 2: ");
-			scanf("%u", &x);
-			printf("%d\n", IsPow2(x));
-			break;
+			printf("%u, ", arr[i]);
 		}
-		case 4:
-		{
-			printf("insert a number to incriment by one: ");
-			scanf("%d", &x1);
-			printf("%d\n", PlusOne(x1));
-			break;
-		}
-		case 16:
-		{
-			esc = Esc();
-		}
-		
+		count = 0;
 	}
-	}
-	return 0;
+	printf("\n");
 }
+	
+/***Ex5 A***/
+unsigned int ByteMirrorLoop(unsigned int x)
+{
+	unsigned int mirror = 0, i = 0;
+	
+	for (i = 0; i < NO_OF_BITS; i++)
+	{
+		mirror <<= 1;
+		mirror |= 1 & x;
+		x >>= 1;
+	}
+	
+	return mirror;
+}
+
+/***Ex5 B***/
+unsigned int ByteMirror(unsigned int x)
+{
+	x = ((x & m1) >> 16) | ((x & m2) << 16);
+	x = ((x & m3) >> 8) | ((x & m4) << 8);
+	x = ((x & m5) >> 4) | ((x & m6) << 4);
+	x = ((x & m7) >> 2) | ((x & m8) << 2);
+	x = ((x & m9) >> 1) | ((x & m10) << 1);
+	return x; 	
+}
+/***Ex6 A***/
+int Check2n6(unsigned char c)
+{
+	unsigned int two = TWO, six = SIX;
+	
+	two = (two & c) >> 1;
+	six = (six & c) >> 5;
+	return two & six;
+}
+
+/***Ex6 B***/
+int Check2or6(unsigned char c)
+{
+	unsigned int two = TWO, six = SIX;
+	
+	two = (two & c) >> 1;
+	six = (six & c) >> 5;
+	return two | six;
+}
+
+/***Ex6 C***/
+int Swap3n5(unsigned char c)
+{
+	unsigned int three = 0, five = 0, tmp = 0;
+	
+	five = (c >> 4) & 1;
+	three = (c >> 2) & 1;
+	
+	tmp = five ^ three;
+	
+	five = tmp << 4;
+	three = tmp << 2;
+	
+	return (c ^ (five | three));
+}
+
+/***Ex7***/
+unsigned int ClosestSmaller(unsigned int x)
+{
+	return (x >> 4) << 4;
+} 
+
+/***Ex8***/
+void Swap(unsigned int *px, unsigned int *py)
+{
+	*px <<= NO_OF_BITS / sizeof(unsigned int);
+	*py = *py ^ *px;
+	*px = *py % NO_OF_BITS;
+	*py >>= NO_OF_BITS / sizeof(unsigned int);
+}
+
+/***Ex9 A***/
+int LoopBitsOnNum(unsigned int x)
+{
+	unsigned int one = 1, count = 0;
+	while (one <= x)
+	{
+		count += one & x;
+		x >>= 1;
+	}
+	return count;
+}
+
+/***Ex9 B***/
+int BitsNum(unsigned int x)
+{
+
+    return x;
+}
+
+/***Ex10***/
+/*not yet ready*/
+
+/***print bits***/
+int BitPrint(int a, int loc)   
+{
+    int buf = a & 1<<loc;
+
+    if (buf == 0)
+    {
+    	 return 0;
+    }
+    else 
+    {
+    	return 1; 
+    }
+}
+
+/***Ex11***/
+int *FloatAnalysis(float f)
+{
+	unsigned int *b = 0;
+	int i = NO_OF_BITS - 1;
+    b = (unsigned int*) &f;
+    
+    for (i = NO_OF_BITS - 1; i >= 0; i--)
+    {
+        printf("%d ", BitPrint(*b, i));
+    }
+
+    return 0;
+}
+
 
