@@ -37,13 +37,13 @@ int main()
 		5 -	Print3BitsInt\n\
 		6 -	ByteMirrorLoop\n\
 		7 -	ByteMirror\n\
-		8 -	Check2n6\n\
-		9 -	Check2or6\n\
+		8 -	Is2n6On\n\
+		9 -	Is2or6On\n\
 		10 -	Swap3n5\n\
 		11 -	ClosestSmaller\n\
 		12 - 	Swap\n\
-		13 - 	LoopBitsOnNum\n\
-		14 - 	BitsOnNum\n\
+		13 - 	LoopCountBitsOn\n\
+		14 - 	CountBitsOn\n\
 		15 - 	FloatAnalysis\n");
 		
 	while (esc)
@@ -126,8 +126,8 @@ int main()
 			{
 				test(ByteMirror(1) == 2147483648, "1");
 				test(ByteMirror(0) == 0, "0");
-				test(ByteMirror(2147483648) == 1, "2147483648")
-				;
+				test(ByteMirror(2147483648) == 1, "2147483648");
+				
 				printf("Insert a number to flip bitwise: ");
 				scanf("%u", &x);
 				printf("%u", ByteMirror(x));
@@ -135,24 +135,25 @@ int main()
 			}
 			case 8:
 			{
-				test(Check2n6(2) == 0, "2");
-				test(Check2n6(34) == 1, "34");
-				test(Check2n6(0) == 0, "0");
+				test(Is2n6On(2) == 0, "2");
+				test(Is2n6On(34) == 1, "34");
+				test(Is2n6On(0) == 0, "0");
+				test(Is2n6On(102) == 1, "102");
 				
 				printf("Insert a num to check bits 2 & 6: ");
 				scanf("%c", &c);
-				printf("%d", Check2n6(c)); 
+				printf("%d", Is2n6On(c)); 
 				break;
 			}
 			case 9:
 			{
-				test(Check2or6(2) == 1, "2");
-				test(Check2or6(34) == 1, "34");
-				test(Check2or6(0) == 0, "0");
+				test(Is2or6On(2) == 1, "2");
+				test(Is2or6On(34) == 1, "34");
+				test(Is2or6On(0) == 0, "0");
 				
 				printf("Insert a num to check bits 2 | 6: ");
 				scanf("%c", &c);
-				printf("%d", Check2or6(c));
+				printf("%d", Is2or6On(c));
 				break;
 			}
 			case 10:
@@ -196,19 +197,26 @@ int main()
 			}
 			case 13:
 			{
-				test(LoopBitsOnNum(43256) == 8, "43256");
-				test(LoopBitsOnNum(9999999) == 14, "9999999");
-				test(LoopBitsOnNum(0) == 0, "0");
-				test(LoopBitsOnNum(1) == 1, "1");
+				test(LoopCountBitsOn(43256) == 8, "43256");
+				test(LoopCountBitsOn(9999999) == 14, "9999999");
+				test(LoopCountBitsOn(0) == 0, "0");
+				test(LoopCountBitsOn(1) == 1, "1");
 				
 				printf("insert a number to count set bits: ");
 				scanf("%d", &n);
-				printf("no of bits: %d", LoopBitsOnNum(n));
+				printf("no of bits: %d", LoopCountBitsOn(n));
 				break;
 			}
 			case 14:
 			{
+				test(CountBitsOn(43256) == 8, "43256");
+				test(CountBitsOn(9999999) == 14, "9999999");
+				test(CountBitsOn(0) == 0, "0");
+				test(CountBitsOn(1) == 1, "1");
 				
+				printf("insert a number to count set bits: ");
+				scanf("%d", &n);
+				printf("no of bits: %d", CountBitsOn(n));
 				break;
 			}
 			case 15:

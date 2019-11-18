@@ -111,7 +111,7 @@ unsigned int ByteMirror(unsigned int x)
 	return x; 	
 }
 /***Ex6 A***/
-int Check2n6(unsigned char c)
+int Is2n6On(unsigned char c)
 {
 	unsigned int two = 1 << 1, six = 1 << 5;
 	
@@ -121,7 +121,7 @@ int Check2n6(unsigned char c)
 }
 
 /***Ex6 B***/
-int Check2or6(unsigned char c)
+int Is2or6On(unsigned char c)
 {
 	unsigned int two = 1 << 1, six = 1 << 5;
 	
@@ -160,7 +160,7 @@ void Swap(unsigned int *px, unsigned int *py)
 }
 
 /***Ex9 A***/
-int LoopBitsOnNum(unsigned int x)
+int LoopCountBitsOn(unsigned int x)
 {
 	unsigned int one = 1, count = 0;
 	while (one <= x)
@@ -172,15 +172,18 @@ int LoopBitsOnNum(unsigned int x)
 }
 
 /***Ex9 B***/
-int BitsNum(unsigned int x)
+/***Hamming weight***/
+int CountBitsOn(unsigned int x)
 {
-
+    x = (x & m10 ) + ((x >>  1) & m10 ); /*put count of each  2 bits into those  2 bits*/ 
+    x = (x & m8 ) + ((x >>  2) & m8 ); /*put count of each  4 bits into those  4 bits*/ 
+    x = (x & m6 ) + ((x >>  4) & m6 ); /*put count of each  8 bits into those  8 bits*/
+    x = (x & m4 ) + ((x >>  8) & m4 ); /*put count of each 16 bits into those 16 bits*/ 
+    x = (x & m2) + ((x >> 16) & m2); /*put count of each 32 bits into those 32 bits*/ 
     return x;
 }
 
 /***Ex10***/
-/*not yet ready*/
-
 /***print bits***/
 int BitPrint(int a, int loc)   
 {
@@ -210,5 +213,6 @@ int *FloatAnalysis(float f)
 
     return 0;
 }
+
 
 

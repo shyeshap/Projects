@@ -7,6 +7,7 @@
 #define TWO 2
 #define SIX 32
 #define UNUSED(var) (void)(var)
+
 #define m1 0xFFFF0000
 #define m2 0x0000FFFF
 #define m3 0xFF00FF00
@@ -30,13 +31,13 @@ int PlusOne(int x);
 void Print3BitsInt(unsigned int *arr, int size);
 unsigned int ByteMirrorLoop(unsigned int x);
 unsigned int ByteMirror(unsigned int x);
-int Check2n6(unsigned char c);
-int Check2or6(unsigned char c);
+int Is2n6On(unsigned char c);
+int Is2or6On(unsigned char c);
 int Swap3n5(unsigned char c);
 unsigned int ClosestSmaller(unsigned int x);
 void Swap(unsigned int *px, unsigned int *py);
-int LoopBitsOnNum(unsigned int x);
-int BitsNum(unsigned int x);
+int LoopCountBitsOn(unsigned int x);
+int CountBitsOn(unsigned int x);
 int *FloatAnalysis(float f);
 
 #endif

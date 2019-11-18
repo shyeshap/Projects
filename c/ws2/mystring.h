@@ -3,9 +3,15 @@
 
 #ifndef _mystring_h
 #define _mystring_h
-
 #include <stdio.h>
 #include <stddef.h>
+
+int IsPalindrome(const char *str);
+int *SevenBoom(int from, int to);
+void Swap(int **x, int **y);
+void SpaceDelete(char *str);
+
+
 
 
  size_t MyStrLen(const char *s);
