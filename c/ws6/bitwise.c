@@ -1,3 +1,10 @@
+/******************************************************************************
+			Ws06 - Bitwise Operations
+			Shye Shapira
+			17.11.19
+			revirewer- Yoav
+*******************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,10 +21,6 @@ int LoopIsPow2(unsigned int n)
 {
 	unsigned int num = 1;
 	
-	if (n == 0)
-	{
-		return 0;
-	}
 	for (num = 1; n >= num; num = num << 1)
 	{
 	    if (num == n)
@@ -59,16 +62,16 @@ int PlusOne(int x)
 }
 
 /***Ex4***/
-void Print3BitsInt(unsigned int *arr)
+void Print3BitsInt(unsigned int *arr, int size)
 {
 	int i = 0, count = 0, n = 0;
 	unsigned int cpy_i = 0;
-	n = sizeof(arr) / sizeof(unsigned int) + 1;
+	n = size / sizeof(unsigned int);
 	
 	for (i = 0; i < n; ++i)
 	{
 		cpy_i = arr[i];
-		while ((cpy_i > 0) & (count <= 3))
+		while ((cpy_i > 0) && (count <= 3))
 		{
 			count += (cpy_i & 1);
 			cpy_i >>= 1;
@@ -110,7 +113,7 @@ unsigned int ByteMirror(unsigned int x)
 /***Ex6 A***/
 int Check2n6(unsigned char c)
 {
-	unsigned int two = TWO, six = SIX;
+	unsigned int two = 1 << 1, six = 1 << 5;
 	
 	two = (two & c) >> 1;
 	six = (six & c) >> 5;
@@ -120,7 +123,7 @@ int Check2n6(unsigned char c)
 /***Ex6 B***/
 int Check2or6(unsigned char c)
 {
-	unsigned int two = TWO, six = SIX;
+	unsigned int two = 1 << 1, six = 1 << 5;
 	
 	two = (two & c) >> 1;
 	six = (six & c) >> 5;
@@ -134,9 +137,7 @@ int Swap3n5(unsigned char c)
 	
 	five = (c >> 4) & 1;
 	three = (c >> 2) & 1;
-	
 	tmp = five ^ three;
-	
 	five = tmp << 4;
 	three = tmp << 2;
 	

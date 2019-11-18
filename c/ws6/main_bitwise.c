@@ -106,9 +106,9 @@ int main()
 				unsigned int arr2[] = {2134, 235, 765, 87, 4546535, 234};
 				unsigned int arr3[] = {'a', 'd', 'h', 'f', 'p'};
 				
-				Print3BitsInt(arr1);
-				Print3BitsInt(arr2);
-				Print3BitsInt(arr3);
+				Print3BitsInt(arr1, sizeof(arr1));
+				Print3BitsInt(arr2, sizeof(arr2));
+				Print3BitsInt(arr3, sizeof(arr3));
 				break;
 			}
 			case 6:

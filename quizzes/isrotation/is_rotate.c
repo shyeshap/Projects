@@ -13,6 +13,7 @@ int IsRotate(char *s1, char *s2)
 	{
 		while (*run1 != '\0')
 		{
+			run2 = s2;
 			count = 0;
 			while ((*run1 != *run2) && (*run2 != '\0'))
 			{
@@ -20,7 +21,7 @@ int IsRotate(char *s1, char *s2)
 			}
 			if (*run2 == '\0')
 			{
-				return 0;
+				break;
 			}
 			while ((*run1 == *run2) && (*run2 != '\0'))
 			{
@@ -28,12 +29,11 @@ int IsRotate(char *s1, char *s2)
 				run2++;
 				count++;
 			}
-			run2 = s2;
-			if (strncmp(run1, run2, (strlen(s1) - count)) == 0)
-			{
-				return 1;
-			}
-			run1 = s1;
+		}
+		run1 = s1;
+		if (strncmp(run1, run2, (strlen(s1) - count)) == 0)
+		{
+			return 1;
 		}
 	}
 	return 0;
@@ -53,7 +53,8 @@ void test(int cond, const char *msg)
 
 int main()
 {
-	char *a = "abc", *b = "efg", *c = "cab", *d = "12345", *e = "45123", *f = "121234", *g = "123412";
+	char *a = "abc", *b = "efg", *c = "cab", *d = "12345", *e = "45123", 
+	*f = "121234", *g = "123412";
 	test(IsRotate(a, b) == 0, "simple test");
 	test(IsRotate(a, c) == 1, "rotated simple test");
 	test(IsRotate(d, e) == 1, "first given test");

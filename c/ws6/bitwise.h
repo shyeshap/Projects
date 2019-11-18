@@ -27,7 +27,7 @@ long Pow2(unsigned int x, unsigned int y);
 int LoopIsPow2(unsigned int n);
 int IsPow2(unsigned int n);
 int PlusOne(int x);
-void Print3BitsInt(unsigned int *arr);
+void Print3BitsInt(unsigned int *arr, int size);
 unsigned int ByteMirrorLoop(unsigned int x);
 unsigned int ByteMirror(unsigned int x);
 int Check2n6(unsigned char c);
