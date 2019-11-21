@@ -3,10 +3,6 @@
  *			Reviewr: Ben			*
  ************************************/
 
-#include <stdio.h> /* printf, size_t */
-#include <stdlib.h> /* malloc, free */
-#include <string.h> /* strlen */
-
 #include "struct_arr.h"
 
 #define MAX_ARR 3
@@ -14,57 +10,58 @@
 
 #define UNUSED(var) (void)(var)
 
-
-typedef struct element{
+typedef struct element{ 
 	void *data;
 	void (*print) (void *data);
 	int (*add) (void *data, int);
 	int (*myfree) (void *ptr);
-} element;
+} element_t;
 
-void PrintInt(void *data)
+/* Print functions to stdout for different data-types */
+
+static void PrintInt(void *data)
 {
+	assert(NULL != data);
+	
 	printf("%ld\n", (size_t)data); 
 }
 
-void PrintFloat(void *data)
+static void PrintFloat(void *data)
 {
+	assert(NULL != data);
+		
 	printf("%f\n", *(float *)&data); 
 }
 
-void PrintStr(void *data)
+static void PrintStr(void *data)
 {
 	printf("%s\n", (char *)data);
 }
 
-int AddInt(void *pdata, int n)
+/* increment or concatenate by a given number */
+
+static int AddInt(void *pdata, int n)
 {
+	assert(NULL != pdata);
+	
 	*(int *)pdata = *(int *)pdata + n;
 	return 0;
 }
 
-int AddFloat(void *pdata, int n)
+static int AddFloat(void *pdata, int n)
 {
+	assert(NULL != pdata);
+	
 	*(float *)pdata = *(float *)pdata + (float) n;
 	return 0;
 }
 
-int CountDig(int n)
-{
-	int count = 0;
-	while(n != 0)
-    {
-        n /= 10;
-        ++count;
-    }
-	
-	return count;
-}
-
-int AddStr(void *pdata, int n)
+static int AddStr(void *pdata, int n)
 {
 	char int_to_str[MAX_INT];
 	int len = 0;
+	
+	assert(NULL != pdata);
 	
 	sprintf(int_to_str, "%d", n);
 	len = strlen(int_to_str);
@@ -72,8 +69,9 @@ int AddStr(void *pdata, int n)
 	*(char **)pdata = (char *) realloc (*(char **)pdata, strlen (*(char **)pdata) + len + 1);
 	if(pdata == NULL)
 	{
-		return 1;
 		fprintf(stderr , "Error line: %d", __LINE__);
+		
+		return 1;
 	}
 	
 	strcat(*(char **)pdata, int_to_str);
@@ -82,21 +80,23 @@ int AddStr(void *pdata, int n)
 }
 
 
+/* free functions */
 
-int FreeDummi(void *data)
+static int FreeStr(void *data)
+{
+	assert(NULL != data);
+	
+	free(data); data = NULL;
+	
+	return 0;
+}
+
+static int FreeDummi(void *data)
 {
 	UNUSED(data);
+	
 	return 0;
 }
-
-
-
-int FreeStr(void *data)
-{
-	free(data); data = NULL;
-	return 0;
-}
-
 
 int Infrastruct()
 {
@@ -104,13 +104,13 @@ int Infrastruct()
 	float f = 3.7;
 	char str[] = "abcdef";
 	char *copy = NULL;
-	element struct_arr[MAX_ARR];
+	element_t struct_arr[MAX_ARR];
 	
 	copy = (char *) malloc (strlen(str) + 1);
 	if (copy == NULL)
 	{
 		fprintf(stderr , "Error line: %d", __LINE__);
-		return 0;
+		return 1;
 	}
 	
 	*(float *)&(struct_arr[0].data) = f;
@@ -141,7 +141,7 @@ int Infrastruct()
 		struct_arr[i].myfree(struct_arr[i].data);
 	}
 	
-	return 1;
+	return 0;
 }
 
 
