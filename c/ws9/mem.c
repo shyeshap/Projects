@@ -7,14 +7,17 @@
 /*                               */
 /*********************************/
 
+#include <stdio.h> /* printf(), size_t */
+#include <string.h> /* strlen() */
 #include <assert.h> /* assert */
+#include <stdlib.h> /* malloc, free */
+
 #include "mem.h"
 
 #define WORD_SIZE sizeof(size_t)
 #define ASCII_CHARS 127
 
 /*** EX1 ***/
-/* Aid function that create word-size repetitions of x */ 
 static size_t SetWord(int x)
 {
 	size_t word = (size_t) x;
@@ -63,7 +66,7 @@ void *MyMemset(void *ptr, int x, size_t n)
 	
 	return ptr;	
 }
-	
+
 void *MyMemcpy(void *dst, const void *src, size_t n)
 {
 	char *runner_dst = NULL, *runner_src = NULL;
@@ -109,7 +112,7 @@ void *MyMemcpy(void *dst, const void *src, size_t n)
 	
 	return dst;
 }
-
+	
 void *MyMemmove(void *dst, const void *src, size_t num)
 {
 	char *end_src = NULL, *end_dst = NULL;
@@ -139,13 +142,12 @@ void *MyMemmove(void *dst, const void *src, size_t num)
 }
 
 /*** EX2 ***/
-/* Aid function to reverse string */
 static char *ReverseStr(char *str)
 {
 	char tmp = 0, *src = NULL, *dst = NULL;
 	size_t len = 0;
 	
-	assert(str != NULL);
+	assert(NULL != str);
 	
 	len = strlen(str);
 	src = str;
@@ -163,7 +165,6 @@ static char *ReverseStr(char *str)
 	return str;
 }
 
-/* itoa by base of 10 */
 char *ItoAby10(int num, char *str)
 {
 	int signe = 0;
@@ -198,7 +199,6 @@ char *ItoAby10(int num, char *str)
 	return head;
 }
 
-/* itoa by any base */
 char *ItoAAnyBase(int num, char *str, int base)
 {
 	int signe = 0, rem = 0;
@@ -208,7 +208,7 @@ char *ItoAAnyBase(int num, char *str, int base)
 	
 	head =  str;
 	
-	if (num < 0 && 10 == base)
+	if ((num < 0) && (10 == base))
 	{
 		signe = num;
 		num = -num;
@@ -234,7 +234,6 @@ char *ItoAAnyBase(int num, char *str, int base)
 	return head;
 }
 
-/* atoi by base of 10 */
 int AtoIby10(const char *nptr)
 {
 	const char *runner = NULL;
@@ -269,7 +268,6 @@ int AtoIby10(const char *nptr)
 	return ret;
 }
 
-/* aid function for power calculation */
 static long power(int base, int exp)
 {
 	long lbase = (long)base, pow = 1;
@@ -279,7 +277,7 @@ static long power(int base, int exp)
 		return 1;
 	}
 	
-	while (exp > 0)
+	while (0 < exp)
 	{
 		lbase *= pow;
 		pow = (long)base;
@@ -297,10 +295,9 @@ int AtoIAnyBase(const char *nptr, int base)
 	unsigned int len = strlen(nptr), exp = 0;
 	
 	assert(NULL != nptr);
-	assert(37 > base && 0 < base);
+	assert((37 > base) && (0 < base));
 	
 	runner = nptr;
-	
 	runner += len - 1;
 	
 	if ('-' == *nptr && 10 == base)
@@ -325,7 +322,6 @@ int AtoIAnyBase(const char *nptr, int base)
 }
 
 /*** EX3 ***/
-/* aid function to set array of structs */
 static ascii_t *SetArr(ascii_t arr[])
 {
 	int i = 0;
@@ -371,7 +367,7 @@ void CmpThreeArr(char *arr1, int len1, char *arr2, int len2, char *arr3, int len
 	
 	for (i = 0; i < ASCII_CHARS; ++i)
 	{
-		if((int)arr[i].status == 2)
+		if ((int)arr[i].status == 2)
 		{
 			printf ("%c ", arr[i].c);
 		}
@@ -382,7 +378,7 @@ void CmpThreeArr(char *arr1, int len1, char *arr2, int len2, char *arr3, int len
 }
 
 /*** EX4 ***/
-int IsLittleEndian() /* if little return 1, else return 0 */
+int IsLittleEndian() 
 {
 	size_t checkend = 1;
 	size_t *ptr = &checkend;

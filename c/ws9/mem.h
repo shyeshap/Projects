@@ -10,10 +10,6 @@
 #ifndef _mem_h
 #define _mem_h
 
-#include <stdio.h> /* printf(), size_t */
-#include <stdlib.h> /* malloc, free */
-#include <string.h> /* strlen(), strcmp(), memset(), memcpy(), memmove() */
-
 #define GRN  "\x1B[32m"
 #define RED  "\x1B[31m"
 #define RESET "\x1B[0m"
@@ -25,7 +21,6 @@ typedef struct ascii
 	char c;
 	int status;
 } ascii_t;
-
 
 void *MyMemset(void *ptr, int x, size_t n);
 void *MyMemcpy(void *dst, const void *src, size_t n);

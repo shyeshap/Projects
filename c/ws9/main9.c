@@ -7,9 +7,11 @@
 /*                               */
 /*********************************/
 
+#include <stdio.h> /* printf(), size_t */
+#include <stdlib.h> /* malloc */
+#include <string.h> /* strcmp(), memset(), memcpy(), memmove() */
+
 #include "mem.h"
-
-
 
 void Test(int cond, const char *msg)
 {
@@ -34,12 +36,40 @@ int main()
     char *str1, *str2, *str3, *str4, *str5, *str6, *str7, *str8;
     
     str1 = (char*) malloc(31);
+    if (NULL == str1)
+    {
+    	return 1;
+    }
     str2 = (char*) malloc(12);
+    if (NULL == str2)
+    {
+    	return 1;
+    }
     str3 = (char*) malloc(16);
+    if (NULL == str3)
+    {
+    	return 1;
+    }
     str4 = (char*) malloc(11);
+    if (NULL == str4)
+    {
+    	return 1;
+    }
     str5 = (char*) malloc(11);
+    if (NULL == str5)
+    {
+    	return 1;
+    }
     str7 = (char*) malloc(8);
-    str8 = (char*) malloc(13);    
+    if (NULL == str7)
+    {
+    	return 1;
+    }
+    str8 = (char*) malloc(13);
+    if (NULL == str8)
+    {
+    	return 1;
+    }   
     
     strcpy(str1, "abcdefghijklmnopqrstuvwxyz");
     strcpy(str2, "hello world");
