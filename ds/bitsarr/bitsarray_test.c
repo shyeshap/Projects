@@ -7,6 +7,7 @@
 /*                               */
 /*********************************/
 
+#include <stdio.h> /* printf */
 #include <string.h> /* strcmp(), strcpy() */
 #include <stdlib.h> /*malloc */
 
@@ -18,6 +19,7 @@
 
 #define M1   0x5555555555555555UL
 #define M8   0x00FF00FF00FF00FFUL
+
 
 #define BITS_IN_WORD 64
 
@@ -78,7 +80,7 @@ static void TestFlip()
 
 static void TestToStr()
 {
-	char *arr = (char *) malloc (BITS_IN_WORD * sizeof(char));
+	char *arr = (char *) malloc ((BITS_IN_WORD + 1) * sizeof(char));
 	
 	cmp = "0000000000000000000000000000000000111010110111100110100010110001";
 	RUN_TEST(!(strcmp(BArrToString(987654321, arr), cmp)), "to str 1");
