@@ -1,4 +1,3 @@
-
 #include <stdio.h>  /*printf() */
 #include <string.h> /* strcmp(), strcpy() */
 #include <stdlib.h> /*malloc */
