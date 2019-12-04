@@ -14,40 +14,42 @@
 
 typedef struct Vector vector_t;
 
-/* This function creates the vector */
+/* creates the vector */
 /* only positive parameters */
 vector_t *VectorCreate(size_t element_size, size_t capacity);
 
-/* This function destroy the vector */
+/* destroy the vector */
 /* Warning: the function doesn't get NULL pointer */
-void VectorDestroy(vector_t *myvector);
+void VectorDestroy(vector_t *vector);
 
-/* This function push new item at the end of the vector */
+/* push new item at the end of the vector */
 /* 0 - success , 1- failure */
 /* Warning: Could resize the capacity in an unpredictable manner */
 /* Warning: the function doesn't get NULL pointer */
-int VectorPushBack(vector_t *myvector, const void *data);
+int VectorPushBack(vector_t *vector, const void *data);
 
-/* This function pops the last item in the vector */
+/* pops the last item in the vector */
 /* Warning: the function doesn't get NULL pointer */
-void VectorPopBack(vector_t *myvector);
+/* WORNING! undefined behavior for empty list */
+void VectorPopBack(vector_t *vector);
 
-/* This function resizing the vector size as needed with extra space */
+/* resizing the vector size as needed with extra space */
 /* 0 - success , 1- failure */
 /* Warning: the function doesn't get NULL pointer */
-int VectorReserve(vector_t *myvector, size_t new_capacity);
+/* undefined behavior for new capacity in size 0 */
+int VectorReserve(vector_t *vector, size_t new_capacity);
 
 /* This function return the total size of the vetor */
 /* Warning: the function doesn't get NULL pointer */
-size_t VectorCapacity(const vector_t *myvector);
+size_t VectorCapacity(const vector_t *vector);
 
 /* This function return the current number of elements in the vetor */
 /* Warning: the function doesn't get NULL pointer */
-size_t VectorSize(const vector_t *myvector);
+size_t VectorSize(const vector_t *vector);
 
 /* This function return specific item address to the user */
-/* Warning: the address is valid until using PopBack/PushBack over the limit */
+/* Warning: undefined behavior for position over size or under 1 */
 /* Warning: the function doesn't get NULL pointer */
-void *VectorGetItemAddress(const vector_t *myvector, size_t position);
+void *VectorGetItemAddress(const vector_t *vector, size_t position);
 
 #endif

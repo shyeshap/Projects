@@ -29,122 +29,99 @@ vector_t *VectorCreate(size_t element_size, size_t capacity)
 	void *start = NULL;
 	vector_t *new_vector = NULL;
 	
-	if (0 == element_size || 0 == capacity)
+	new_vector = (vector_t *)malloc(sizeof(vector_t));
+	if (NULL == new_vector)
 	{
-		return NULL;
-	}
-	else
-	{
-		new_vector = (vector_t *)malloc(sizeof(vector_t));
-		if (NULL == new_vector)
-		{
-			return NULL;
-		} 
 		start = (void *)malloc(element_size * capacity);
 		if (NULL == start)
 		{
 			return NULL; 
 		}
 		
-		new_vector->start = start;
-		new_vector->size = 0;
-		new_vector->capacity = capacity;
-		new_vector->element_size = element_size;
-	}
+		return NULL;
+	} 
+	
+	new_vector->start = start;
+	new_vector->size = 0;
+	new_vector->capacity = capacity;
+	new_vector->element_size = element_size;
 
 	return new_vector;
 }
 
-void VectorDestroy(vector_t *myvector)
+void VectorDestroy(vector_t *vector)
 {
-	assert(NULL != myvector);
+	assert(NULL != vector);
 	
-	free(myvector->start); myvector->start = NULL;
-	free(myvector); myvector = NULL;
+	free(vector->start); vector->start = NULL;
+	free(vector); vector = NULL;
 }
 
-int VectorReserve(vector_t *myvector, size_t new_capacity)
+int VectorReserve(vector_t *vector, size_t new_capacity)
 {
-	assert(NULL != myvector);
-	
-	if (new_capacity > 0)
-	{
-		myvector->start = (void *)realloc(myvector->start, new_capacity * 
-													myvector->element_size);
-		if(NULL == myvector->start)
-		{
-			return 1;
-		}
-		
-		myvector->capacity = new_capacity;
-		
-		return 0;
-	}
-	else
+	assert(NULL != vector);
+
+	vector->start = (void *)realloc(vector->start, new_capacity * 
+											vector->element_size);
+	if(NULL == vector->start)
 	{
 		return 1;
 	}
-}
-
-size_t VectorCapacity(const vector_t *myvector)
-{
-	assert(NULL != myvector);
 	
-	return myvector->capacity;
-}
-
-size_t VectorSize(const vector_t *myvector)
-{
-	assert(NULL != myvector);
+	vector->capacity = new_capacity;
 	
-	return myvector->size;
+	return 0;
 }
 
-int VectorPushBack(vector_t *myvector, const void *data)
+size_t VectorCapacity(const vector_t *vector)
+{
+	assert(NULL != vector);
+	
+	return vector->capacity;
+}
+
+size_t VectorSize(const vector_t *vector)
+{
+	assert(NULL != vector);
+	
+	return vector->size;
+}
+
+int VectorPushBack(vector_t *vector, const void *data)
 {
 	int status = 0;
 	void *current = NULL;
 
-	assert(NULL != myvector);
+	assert(NULL != vector);
 	assert(NULL != data);
 	
-	if (myvector->size == myvector->capacity)
+	if (vector->size == vector->capacity)
 	{
-		status = VectorReserve(myvector, myvector->capacity * GROWTH_FACTOR);
+		status = VectorReserve(vector, vector->capacity * GROWTH_FACTOR);
 	}
 	
-	current = (char *)myvector->start + (myvector->size * 
-										myvector->element_size);
-	memmove(current, data, myvector->element_size);
-	++myvector->size;
+	current = (char *)vector->start + (vector->size * 
+										vector->element_size);
+	memcpy(current, data, vector->element_size);
+	++vector->size;
 	
 	return status;
 }
 
-void VectorPopBack(vector_t *myvector)
+void VectorPopBack(vector_t *vector)
 {
-	if (myvector->size > 0)
-	{
-		--myvector->size;
+	--vector->size;
 	
-		if (myvector->size == myvector->capacity / SHRINK_POINT)
-			{
-				VectorReserve(myvector, myvector->capacity / SHRINK_FACTOR);
-			}
+	if (vector->size == vector->capacity / SHRINK_POINT)
+	{
+		VectorReserve(vector, vector->capacity / SHRINK_FACTOR);
 	}
 }
 
-void *VectorGetItemAddress(const vector_t *myvector, int position)
+void *VectorGetItemAddress(const vector_t *vector, int position)
 {
-	if ((position > myvector->size) || (position == 0))
-	{
-		return NULL;
-	}
-	else
-	{
-		return ((char *)myvector->start + ((position - 1) * 
-											myvector->element_size));	
-	}
+		return ((char *)vector->start + ((position - 1) * 
+											vector->element_size));
 }
 
 

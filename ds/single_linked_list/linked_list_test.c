@@ -1,7 +1,7 @@
 /*********************************/
 /*    Data Structures            */
 /*    Single Linked List         */       
-/*    Author :Guy Cohen Zedek    */
+/*    Author :Shye Shapira    */
 /*    Reviewed By:               */
 /*    Date:    2/12/2019         */
 /*                               */
@@ -15,21 +15,21 @@
 #define GREEN "\033[;032m"
 #define RED   "\033[;031m"
 #define RESET "\033[0m"
-#define RUN_TEST(test)\
-{\
-  if(test)\
-  {\
-    printf(GREEN);\
-    printf("SUCCESS\n");\
-    printf(RESET);\
-  }\
-  else\
-  {\
-    printf(RED);\
-    printf("FAIL \n");\
-    printf(RESET);\
-  }\
-}
+#define RUN_TEST(test)				\
+			{						\
+			  if(test)				\
+			  {						\
+				printf(GREEN);		\
+				printf("SUCCESS\n");\
+				printf(RESET);		\
+			  }						\
+			  else					\
+			  {						\
+				printf(RED);		\
+				printf("FAIL \n");	\
+				printf(RESET);		\
+			  }						\
+			}
 
 int PrintNode(void *node, void *additional) 
 {
@@ -52,7 +52,7 @@ int IsMatch(void *node, void *additional)
 static void TestLinkedList()
 {
     int x1 = 1, x2 = 2, x3 = 3, x4 = 4, x5 = 5;
-    node_t *head = NULL, *node1 = NULL, *node2 = NULL, *node3 = NULL, *node4 =NULL;
+    node_t *head = NULL, *node1 = NULL, *node2 = NULL, *node3 = NULL, *node4 =NULL, *node5 = NULL;
     
     printf("Linked List 1:\n");
     node1 = SLLCreateNode(NULL, &x1);
@@ -145,6 +145,12 @@ static void TestLinkedList()
     
     node4->next = NULL;
     SLLDestroy(node1);
+    
+    node3 = SLLCreateNode(NULL, &x3);
+    node2 = SLLCreateNode(node3, &x2);
+    node1 = SLLCreateNode(node2, &x1);
+    
+    RUN_TEST(0 == SLLHasLoop(node1));
 }
 
 int main()

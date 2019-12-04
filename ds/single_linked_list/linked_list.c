@@ -10,7 +10,7 @@
 #include <stdlib.h> /* malloc(), free() */
 #include <assert.h> /* assert */
 
-#include "linked_list.h"
+#include "linked_list.h" /*Single Linked List API Functions*/ 
 
 #define FREE(x) free(x); x = NULL;
 
@@ -21,8 +21,6 @@ node_t *SLLCreateNode(node_t *next, const void *data)
 	{
 		return NULL;
 	}
-	
-	assert(NULL != data);
 	
 	node->next = next;
 	node->data = (void *)data;
@@ -102,13 +100,13 @@ void SLLRemoveAfter(node_t *node)
 size_t SLLSize(const node_t *head)
 {
 	node_t *runner = NULL;
-	size_t counter = 1;
+	size_t counter = 0;
 	
 	assert(NULL != head);
 	
 	runner = (node_t *)head;
 	
-	while (NULL != runner->next)
+	while (NULL != runner)
 	{
 		runner = runner->next;
 		++counter;
@@ -148,13 +146,9 @@ node_t *SLLGetNode(const node_t *head, match_func_ptr_t func_ptr, void *addition
 	
 	runner = (node_t *)head;
 	
-	while (NULL != runner)
+	while (NULL != runner && 0 == func_ptr(runner, additional))
 	{
-		if (0 == func_ptr(runner, additional))
-		{
-			runner = runner->next;
-		}
-		else break;
+		runner = runner->next;
 	}
 	
 	return runner;
@@ -187,10 +181,15 @@ int SLLHasLoop(const node_t *head)
 	fast_runner = (node_t *)head->next;
 	slow_runner = (node_t *)head;
 
+	
 	while (fast_runner->next != NULL && fast_runner != slow_runner)
 	{
 		slow_runner = slow_runner->next;
 		fast_runner = fast_runner->next;
+		if (fast_runner->next == NULL)
+		{
+			break;
+		}
 		fast_runner = fast_runner->next;
 	}
 	
@@ -199,35 +198,35 @@ int SLLHasLoop(const node_t *head)
 
 node_t *SLLFindIntersection(const node_t *head1, const node_t *head2)
 {
-	size_t size1 = 0, size2 = 0, diff = 0;
-	node_t *runner1 = NULL, *runner2 = NULL;
+	size_t size1 = 0, size2 = 0, difference = 0;
+	const node_t *runner1 = NULL, *runner2 = NULL;
 	
 	assert(NULL != head1);
 	assert(NULL != head2);
 	
 	size1 = SLLSize(head1);
 	size2 = SLLSize(head2);
-	runner1 = (node_t *)head1;
-	runner2 = (node_t *)head2;
+	runner1 = head1;
+	runner2 = head2;
 	
 	if (size1 > size2)
 	{
-		diff = size1 - size2;
+		difference = size1 - size2;
 		
-		while (diff > 0)
+		while (difference > 0)
 		{
 			runner1 = runner1->next;
-			--diff;
+			--difference;
 		}
 	}
 	else if (size2 > size1)
 	{
-		diff = size2 - size1;
+		difference = size2 - size1;
 		
-		while (diff > 0)
+		while (difference > 0)
 		{
 			runner2 = runner2->next;
-			--diff;
+			--difference;
 		}
 	}
 	
@@ -235,11 +234,11 @@ node_t *SLLFindIntersection(const node_t *head1, const node_t *head2)
 	{
 		if (runner1 == runner2)
 		{
-			return runner1;
+			return (node_t *)runner1;
 		}
 		runner1 = runner1->next;
 		runner2 = runner2->next;
 	}
 	
-	return runner1;
+	return (node_t *)runner1;
 }
