@@ -1,7 +1,15 @@
-#include <stdlib.h> /* malloc */
-#include <assert.h> /*assert */
+/************************************/
+/*	  Data Structures				*/
+/*    Doubly linked list			*/
+/*    Author: Shye Shapira			*/
+/*    Reviewed By: YOAV				*/
+/*    Date:     9/12/2019			*/
+/************************************/ 
 
-#include "dllist.h"
+#include <stdlib.h> /* malloc */
+#include <assert.h> /* assert */
+
+#include "dllist.h" /* double linked list functions */
 
 #define FREE(x) free(x); x = NULL;
 
@@ -28,6 +36,8 @@ dll_t *DLLCreate()
 	
 	new_dll->head.prev = NULL;
 	new_dll->tail.next = NULL;
+	new_dll->head.data = NULL;
+	new_dll->tail.data = NULL;
 	new_dll->head.next = &new_dll->tail;
 	new_dll->tail.prev = &new_dll->head;
 	
@@ -51,24 +61,16 @@ void DLLDestroy(dll_t *dll)
 
 iterator_t DLLBegin(const dll_t *dll)
 {
-	iterator_t it;
-	
 	assert(NULL != dll);
 	
-	it = dll->head.next;
-	
-	return it; 
+	return dll->head.next; 
 }
 
 iterator_t DLLEnd(const dll_t *dll)
 {
-	iterator_t it;
-	
 	assert(NULL != dll);
 	
-	it = (DLLnode_t *)&dll->tail;
-	
-	return it;
+	return (DLLnode_t *)&dll->tail;
 }
 
 iterator_t DLLInsert(dll_t *dll, iterator_t it, void *data)
@@ -92,7 +94,9 @@ iterator_t DLLInsert(dll_t *dll, iterator_t it, void *data)
 
 iterator_t DLLRemove(iterator_t it)
 {
-	iterator_t new_it;
+	iterator_t new_it = NULL;
+	
+	assert(NULL != it);
 	
 	new_it = it->next;
 	it->next->prev = it->prev;
@@ -104,28 +108,33 @@ iterator_t DLLRemove(iterator_t it)
 }
 
 iterator_t DLLGetNext(iterator_t it)
-{
-	it = it->next;
+{	
+	assert(NULL != it);
 	
-	return it;
+	return it->next;;
 }
 
 iterator_t DLLGetPrev(iterator_t it)
 {
-	it = it->prev;
+	assert(NULL != it);
 	
-	return it;
+	return it->prev;
 }
 
 int DLLIsEmpty(const dll_t *dll)
 {
+	assert(NULL != dll);
+	
 	return dll->head.next == &dll->tail;
 }
 
 size_t DLLSize(const dll_t *dll)
 {
 	size_t count = 0;
-	iterator_t runner;
+	iterator_t runner = NULL;
+	
+	assert(NULL != dll);
+	
 	runner = dll->head.next;
 	
 	while (runner->next != dll->tail.next)
@@ -139,17 +148,25 @@ size_t DLLSize(const dll_t *dll)
 
 void *DLLGetData(iterator_t it)
 {
+	assert(NULL != it);
+	
 	return it->data;
 }
 
 int DLLIsSameIter(const iterator_t it1, const iterator_t it2)
 {
+	assert(NULL != it1);
+	assert(NULL != it2);
+	
 	return it1 == it2;
 }
 
 iterator_t DLLPushBack(dll_t *dll, void *data)
 {
 	iterator_t it = DLLEnd(dll);
+	
+	assert(NULL != dll);
+	assert(NULL != data);
 	
 	it = DLLInsert(dll, it, data);
 	
@@ -160,6 +177,9 @@ iterator_t DLLPushFront(dll_t *dll, void *data)
 {
 	iterator_t it = DLLBegin(dll);
 
+	assert(NULL != dll);
+	assert(NULL != data);
+	
 	it = DLLInsert(dll, it, data);
 	
 	return it;
@@ -191,6 +211,10 @@ void *DLLPopBack(dll_t *dll)
 
 iterator_t DLLSplice(iterator_t start, iterator_t end, iterator_t where)
 {
+	assert(NULL != start);
+	assert(NULL != end);
+	assert(NULL != where);
+
 	start->prev->next = end;
 	end->prev->next = where->next;
 	where->next->prev = end->prev;
@@ -206,6 +230,9 @@ int DLLForEach(iterator_t start, iterator_t end, action_func_ptr a_ptr, void *ap
 	iterator_t runner = start;
 
 	assert(NULL != ap);
+	assert(NULL != start);
+	assert(NULL != end);
+	assert(NULL != a_ptr);
 	
 	while (end != runner)
 	{
@@ -219,18 +246,25 @@ int DLLForEach(iterator_t start, iterator_t end, action_func_ptr a_ptr, void *ap
 		}
 	}
 	
-	return ((end != runner) );
+	return (end != runner);
 }
 
 iterator_t DLLFind(iterator_t start, iterator_t end, match_func_ptr m_ptr, void *ap)
 {
 	iterator_t runner = start;
 
+	assert(NULL != start);
+	assert(NULL != end);
 	assert(NULL != ap);
+	assert(NULL != m_ptr);
 	
-	while ((0 == m_ptr(runner->data, ap)) && (end != runner))
+	while (end != runner)
 	{
-		runner = runner->next;
+		if (1 == m_ptr(runner->data, ap))
+		{
+			break;
+		}
+		runner = DLLGetNext(runner);
 	}
 	
 	return runner;
