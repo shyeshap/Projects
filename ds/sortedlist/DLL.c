@@ -166,6 +166,7 @@ iterator_t DLLPushBack(dll_t *dll, void *data)
 	iterator_t it = DLLEnd(dll);
 	
 	assert(NULL != dll);
+	assert(NULL != data);
 	
 	it = DLLInsert(dll, it, data);
 	
@@ -228,7 +229,6 @@ int DLLForEach(iterator_t start, iterator_t end, action_func_ptr a_ptr, void *ap
 {
 	iterator_t runner = start;
 
-	assert(NULL != ap);
 	assert(NULL != start);
 	assert(NULL != end);
 	assert(NULL != a_ptr);

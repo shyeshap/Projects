@@ -7,7 +7,6 @@
 int main()
 { 
     double x;
-
  
 	printf("%ld\n", SIZEOF_VAR(x)); 
  	printf("%ld\n", SIZOF_TYPE(double)); 

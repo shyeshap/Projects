@@ -79,7 +79,6 @@ static int AddStr(void *pdata, int n)
 	return 0;
 }
 
-
 /* free functions */
 
 static int FreeStr(void *data)
