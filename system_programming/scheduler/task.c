@@ -22,7 +22,7 @@ task_t *TaskCreate(task_func_t to_do, time_t interval, void *param)
 		}
 		
 		new_task->task_func = to_do;
-		new_task->run_time = time(NULL);
+		new_task->run_time = time(NULL) + interval;
 		new_task->interval = interval;
 		new_task->param = param;
 	}

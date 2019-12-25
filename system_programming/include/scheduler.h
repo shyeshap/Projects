@@ -18,7 +18,7 @@ scheduler_t *SchedulerCreate();
 /*
 * SchedulerDestroy() -
 * Destroys and frees Scheduler from memory.
-* complexity of free();                  
+* complexity of free() or O(n);                
 */
 void SchedulerDestroy(scheduler_t *s);
 
