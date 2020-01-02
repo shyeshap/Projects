@@ -11,7 +11,7 @@
 #include <unistd.h> 		/* sleep */ 
 
 #include "scheduler.h" 		/* scheduler API */
-#include "priorityqueue.h"	/* priority queue API */
+#include "priorityq.h"	/* priority queue API */
 #include "uid.h"			/* UID API */
 #include "task.h"			/*Task Functions*/
 

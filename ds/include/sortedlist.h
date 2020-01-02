@@ -3,7 +3,7 @@
 
 #include <stddef.h> /* size_t */
 
-#include "dllist.h"
+#include "dll.h"
 
 typedef struct Iterator
 {

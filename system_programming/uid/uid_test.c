@@ -24,12 +24,6 @@
                 printf(RESET);\
             }
             
-struct Uid
-{
-	time_t time_stamp;
-	size_t counter;
-	pid_t pid;
-};
   
 int main()
 {

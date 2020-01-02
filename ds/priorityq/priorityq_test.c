@@ -1,6 +1,6 @@
 #include <stdio.h> /* printf */
 
-#include "priorityqueue.h"
+#include "priorityq.h"
 
 #define UNUSED(x) (void)(x)
 

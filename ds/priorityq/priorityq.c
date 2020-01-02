@@ -11,7 +11,7 @@
 #include <stdlib.h>	/* malloc */ 
 
 #include "sortedlist.h" /*sorted list API */
-#include "priorityqueue.h" /* Priority queue API */
+#include "priorityq.h" /* Priority queue API */
 
 #define UNUSED(x) (void)(x)
 #define FREE(ptr) free(ptr); ptr = NULL;

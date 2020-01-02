@@ -50,6 +50,6 @@ size_t VectorSize(const vector_t *vector);
 /* This function return specific item address to the user */
 /* Warning: undefined behavior for position over size or under 1 */
 /* Warning: the function doesn't get NULL pointer */
-void *VectorGetItemAddress(const vector_t *vector, size_t position);
+void *VectorGetItemAddress(const vector_t *vector, int position);
 
 #endif
