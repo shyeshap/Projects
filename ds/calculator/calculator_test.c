@@ -1,101 +1,170 @@
-#include <stdlib.h>
+/************************************************
+*
+* File: calculator_test.c
+* Ex: calculator
+* writer: Israel Drayfus
+* Description: Run and test calculator.
+*
+*************************************************/
 
-#include "utilities.h" /* RUN_TEST */
+#include <stdio.h> /*printf()*/
+
 #include "calculator.h"
 
-static void TestAdd()
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define WHITE "\033[0m"
+
+#define TEST(test, errMsg) if (test)\
+						   {\
+						      printf(GREEN);\
+						      printf("%s\n", "SUCCESS");\
+						   }\
+						   else\
+						   {\
+						      printf(RED);\
+						      printf("%s, %s\n", "FAILURE", errMsg);\
+						   }\
+						   printf(WHITE);
+
+void Test1()
 {
-    char add[] = ".2+3";
-    double result = 0;
-    
-    printf("Add:\n");
-    
-    TEST(0 == Calculator(add, &result), ".2+3");
-    TEST(3.200000 == result, "result");
+	double result = 0.0;
+	
+	Calculator("1+1", &result);
+	TEST(result == 2, "plus");
+	Calculator(" 1 + 1 ", &result);
+	TEST(result == 2, "plus with whitespaces");
+	Calculator(" 1 - 1 ", &result);
+	TEST(result == 0, "minus");
+	Calculator(" 1 / 2 ", &result);
+	TEST(result == 0.5, "devision");
+	Calculator(" 2 * 3 ", &result);
+	TEST(result == 6, "multification");
+	Calculator(" 2 ^ 3 ", &result);
+	TEST(result == 8, "power");
+	Calculator(" 0 + 1 ", &result);
+	TEST(result == 1, "plus with zero");
+	printf("\n");
+	
+	Calculator("2+2+4", &result);
+	TEST(result == 8, "plus twise");
+	Calculator("2*2+4", &result);
+	TEST(result == 8, "different operators");
+	Calculator("2*2+4", &result);
+	TEST(result == 8, "different operators");
+	Calculator("2+-4", &result);
+	TEST(result == -2, "different operators");
+	Calculator("2++4", &result);
+	TEST(result == 6, "different operators");
+	printf("\n");
 }
 
-static void TestSub()
+void Test2()
 {
-    char sub[] = "100-30-20";
-    double result = 0;
-    
-    printf("\nSub:\n");
-    TEST(0 == Calculator(sub, &result), "100-30-20");
-    TEST(50.000000 == result, "result");
+	double result = 0.0;
+	
+	Calculator("2+2*4", &result);
+	TEST(result == 10, "presedence");
+	Calculator("3-2-3", &result);
+	TEST(result == -2, "presedence");
+	Calculator("3^2^3", &result);
+	TEST(result == 6561, "presedence");
+	Calculator("1+2*3^3*2+1", &result);
+	TEST(result == 110, "presedence");
+	printf("\n");
 }
 
-static void TestMult()
+void Test3()
 {
-    char mult[] = "8*4";
-    double result = 0;
-    
-    printf("\nMult:\n");
-    TEST(0 == Calculator(mult, &result), "8*4");
-    TEST(32.000000 == result, "result");
+	double result = 0.0;
+	
+	Calculator("3^2^3/123-81*0+21/89", &result);
+	printf("result = %f (Success = 53.577418)\n", result);
+	Calculator(".35 + 1", &result);
+	printf("result = %f (Success = 1.35)\n", result);
+	Calculator("-.35 + +1", &result);
+	printf("result = %f (Success = 0.65)\n", result);
+	printf("\n");
 }
 
-static void TestDiv()
+void Test4()
 {
-    char div[] = "1/4/2";
-    double result = 0;
-    
-    printf("\nDiv:\n");
-    TEST(0 == Calculator(div, &result), "1/4/2");
-    TEST(0.125000 == result, "result");
+	double result = 0.0;
+	
+	Calculator("(1+2)", &result);
+	TEST(result == 3, "parentheses");
+	Calculator("(1+2+3)", &result);
+	TEST(result == 6, "parentheses");
+	Calculator("1+(1+2)", &result);
+	TEST(result == 4, "parentheses");
+	printf("\n");
+
+	Calculator("(2*(2+2))", &result);
+	TEST(result == 8, "parentheses");
+	Calculator("((2+1)*2)", &result);
+	TEST(result == 6, "parentheses");
+	Calculator("1+(1+2*(3+4))", &result);
+	TEST(result == 16, "parentheses");
+	Calculator("256/(2^2^3)+2", &result);
+	TEST(result == 3, "parentheses");
+	Calculator("2^(1+1)^2", &result);
+	TEST(result == 16, "parentheses");
+	printf("\n");
+
 }
 
-static void TestPower()
+void Test5()
 {
-    char pow[] = "2^3^2+2+3";
-    double result = 0;
-    
-    printf("\nPow:\n");
-    TEST(0 == Calculator(pow, &result), "2^3^2+2+3");
-    TEST(517.000000 == result, "result");
-}
-
-static void TestComplex()
-{
-    char complex1[] = "(2+7)*6+5", complex2[] = "(((((((((2^3)))+3)";
-    double result = 0;
-    
-    printf("\nComplex:\n");
-    TEST(0 == Calculator(complex1, &result), "(2+7)*6+5");
-    TEST(59.000000 == result, "result");
-    TEST(0 == Calculator(complex2, &result), "invalid: (((((((((2^3)))+3)");
-}
-
-static void TestSpaces()
-{
-    char spaces[] = "  2+5";
-    double result = 0;
-    
-    printf("\nSpaces:\n");
-    TEST(0 == Calculator(spaces, &result), "  2+5");
-    TEST(7.000000 == result, "result");
-}
-
-static void TestSyntaxError()
-{
-    char invalid1[] = "24*/8", invalid2[] = "5-", invalid3[] = "4+5)(+3";
-    double result = 0;
-    
-    printf("\nSyntaxError:\n");
-    TEST(1 == Calculator(invalid1, &result), "invalid: 24*/8");
-    TEST(1 == Calculator(invalid2, &result), "invalid: 5-");
-    TEST(1 == Calculator(invalid3, &result), "invalid: 4+5)(+3");
+	double result = 0.0;
+	calc_status_t status;
+	
+	status = Calculator("1+2)", &result);
+	TEST(status == SYNTAX_ERROR, "syntax error");
+	status = Calculator("((1+2)", &result);
+	TEST(status == SUCCESS, "syntax error");
+	status = Calculator("1+2+", &result);
+	TEST(status == SYNTAX_ERROR, "syntax error");
+	status = Calculator("1+2+-", &result);
+	TEST(status == SYNTAX_ERROR, "syntax error");
+	status = Calculator("((1+2 2)", &result);
+	TEST(status == SYNTAX_ERROR, "syntax error");
+	status = Calculator("+1+2 /", &result);
+	TEST(status == SYNTAX_ERROR, "syntax error");
+	status = Calculator("1+2 .", &result);
+	TEST(status == SYNTAX_ERROR, "syntax error");
 }
 
 int main()
-{    
-    TestAdd();
-    TestSub();
-    TestMult();
-    TestDiv();
-    TestPower();
-    TestComplex();
-    TestSpaces();
-    TestSyntaxError();    
-     
-    return 0;
+{
+	Test1();
+	Test2();
+	Test3();
+	Test4();
+	Test5();
+
+	return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

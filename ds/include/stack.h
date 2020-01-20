@@ -24,7 +24,7 @@ void StackDestroy(stack_t* mystack);
 int StackPush(stack_t* mystack, const void* data); /* 1 success, 0 fail */
 
 /* pop the element that is on the top of the Stack and remove it */
-void StackPop(stack_t* mystack);
+void *StackPop(stack_t* mystack);
 
 /* checkes if the Stack is empty */
 int StackIsEmpty(const stack_t* mystack); /* 1 is empty, 0 not empty */
@@ -34,5 +34,7 @@ size_t StackSize(const stack_t* mystack);
 
 /* returns the top most elemet on the Stack */
 void* StackPeek(const stack_t* mystack);
+
+void StackSortRec(stack_t *stack);
 
 #endif

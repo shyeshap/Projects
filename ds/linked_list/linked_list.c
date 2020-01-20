@@ -241,4 +241,20 @@ node_t *SLLFindIntersection(const node_t *head1, const node_t *head2)
 	}
 	
 	return (node_t *)runner1;
-}
+} 
+
+node_t *SLLFlipRec(node_t *head)
+{	
+	node_t *new_head = NULL;
+	
+	if (head->next == NULL)
+	{
+		return head; 
+	}
+	
+	new_head = SLLFlipRec(head->next);
+	head->next->next = head;
+	head->next = NULL;
+		
+	return new_head;
+}                                 

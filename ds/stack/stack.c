@@ -60,14 +60,18 @@ int StackPush(stack_t *stack, const void *data)
 	return 1;
 }
 
-void StackPop(stack_t *stack)
+void *StackPop(stack_t *stack)
 {
+	void *curr = StackPeek(stack);
+
 	assert(NULL != stack);
 	
 	if (stack->current != stack->start)
 	{
 		stack->current = (char *)(stack->current) - stack->element_size;
-	} 
+	}
+	
+	return curr;
 }
 
 int StackIsEmpty(const stack_t *stack)
@@ -106,3 +110,58 @@ void StackDestroy(stack_t *stack)
 	free(stack->start); stack->start = NULL;
 	free(stack); stack = NULL;
 }
+
+void StackSortRec(stack_t *stack)
+{
+	int num = 0, curr = 0;
+	
+	if (2 > StackSize(stack))
+	{
+		return;
+	}
+
+	else if (2 == StackSize(stack))
+	{
+		num = *(int *)StackPop(stack);
+			
+		if (num > *(int *)StackPeek(stack))
+		{
+			StackPush(stack, &num);
+		}
+		
+		else
+		{
+			curr = *(int *)StackPop(stack);
+			StackPush(stack, &num);
+			StackPush(stack, &curr);
+		}
+			
+		return;
+	}
+	
+	num = *(int *)StackPop(stack);
+	StackSortRec(stack);
+	
+	if (num < *(int *)StackPeek(stack))
+	{
+		curr = *(int *)StackPop(stack);
+		StackPush(stack, &num);
+		StackSortRec(stack);
+		StackPush(stack, &curr);
+	}
+	
+	else
+	{
+		StackPush(stack, &num);
+	}
+}
+
+
+
+
+
+
+
+
+
+

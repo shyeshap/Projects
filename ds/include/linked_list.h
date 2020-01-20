@@ -10,6 +10,8 @@
 #ifndef __LINKED_LIST_H__
 #define __LINKED_LIST_H__
 
+#include <stddef.h>
+
 typedef struct Node
 {
     void *data;
@@ -69,4 +71,5 @@ int SLLHasLoop(const node_t *head);
 /* WARNING: Doesnt get NULL pointer */
 node_t *SLLFindIntersection(const node_t *head1, const node_t *head2);
 
+node_t *SLLFlipRec(node_t *head);
 #endif

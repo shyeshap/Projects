@@ -153,8 +153,30 @@ static void TestLinkedList()
     RUN_TEST(0 == SLLHasLoop(node1));
 }
 
+void TestFlip()
+{
+	int x1 = 1, x2 = 2, x3 = 3, x4 = 4, x5 = 5;
+    node_t *head = NULL, *node1 = NULL, *node2 = NULL, *node3 = NULL, *node4 =NULL, *node5 = NULL;
+   
+	node5 = SLLCreateNode(NULL, &x5);
+	node4 = SLLCreateNode(node5, &x4);
+    node3 = SLLCreateNode(node4, &x3);
+    node2 = SLLCreateNode(node3, &x2);
+    node1 = SLLCreateNode(node2, &x1);
+  
+    head = node1;
+    
+    SLLForEach(head, &PrintNode, &x1);
+    
+    head = SLLFlipRec(head);
+    
+    SLLForEach(head, &PrintNode, &x1);
+}
+
 int main()
 {
     TestLinkedList();
+    TestFlip();
+    
     return 0;
 }

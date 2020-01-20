@@ -10,13 +10,14 @@
 #include <string.h> /* strlen() */
 #include <math.h> /* pow() */
 
-#include "arithmetic.h" 
+#include "arithmetic.h" /* calculator implementation API */
 #include "stack.h" /* stack API */
 
-#define FREE(ptr) free(ptr); ptr = NULL;
 #define ASCII_SIZE 256
 #define STATES_NUM 2
+
 #define UNUSED(x) (void)(x)
+#define FREE(ptr) free(ptr); ptr = NULL;
 
 typedef char *(*func_state_t)(const char *expression, calc_t* calc);
 typedef void (*func_op_t)(double x, double y, calc_t *calc);
@@ -58,35 +59,47 @@ struct Calc
 	calc_op_t *op_lut;
 };
 
-static void CalcAdd(double x, double y, calc_t *calc)
+static void CalcAdd(double num1, double num2, calc_t *calc)
 {
-	*calc->result = x + y;
+	assert(NULL != calc);
+	
+	*calc->result = num1 + num2;
 }
 
-static void CalcSub(double x, double y, calc_t *calc)
+static void CalcSub(double num1, double num2, calc_t *calc)
 {
-	*calc->result = x - y;
+	assert(NULL != calc);
+	
+	*calc->result = num1 - num2;
 }
 
-static void CalcMult(double x, double y, calc_t *calc)
+static void CalcMult(double num1, double num2, calc_t *calc)
 {
-	*calc->result = x * y;
+	assert(NULL != calc);
+	
+	*calc->result = num1 * num2;
 }
 
-static void CalcDiff(double x, double y, calc_t *calc)
+static void CalcDiff(double num1, double num2, calc_t *calc)
 {
-	*calc->result = x / y;
+	assert(NULL != calc);
+	
+	*calc->result = num1 / num2;
 }
 
-static void CalcPow(double x, double y, calc_t *calc)
+static void CalcPow(double num1, double num2, calc_t *calc)
 {
-	*calc->result = pow(x, y);
+	assert(NULL != calc);
+	
+	*calc->result = pow(num1, num2);
 }
 
-static void NotOp(double x, double y, calc_t *calc)
+static void Dummy(double num1, double num2, calc_t *calc)
 {
-	UNUSED(x);
-	UNUSED(y);
+	assert(NULL != calc);
+	
+	UNUSED(num1);
+	UNUSED(num2);
 	UNUSED(calc);
 }
 
@@ -99,13 +112,15 @@ static char *DoNothing(const char *expression, calc_t* calc)
 
 static int CalcFold(calc_t *calc)
 {
-	double x = 0, y = 0;
+	double num1 = 0, num2 = 0;
 	
-	x = *(double *)StackPeek(calc->num);
+	assert(NULL != calc);
+	
+	num1 = *(double *)StackPeek(calc->num);
 	StackPop(calc->num);
-	y = *(double *)StackPeek(calc->num);
+	num2 = *(double *)StackPeek(calc->num);
 	StackPop(calc->num);
-	calc->op_lut[(int)*(char *)StackPeek(calc->ops)].op_func(y, x, calc);
+	calc->op_lut[(int)*(char *)StackPeek(calc->ops)].op_func(num2, num1, calc);
 	
 	StackPop(calc->ops);
 	
@@ -114,25 +129,24 @@ static int CalcFold(calc_t *calc)
 
 static char *HandleSpace(const char *expression, calc_t* calc)
 {	
-	char *runner = (char *)expression;
-
 	UNUSED(calc);
 	
-	return ++runner;
+	return (char *)++expression;
 }
 
 static char *CalcHandleNum(const char *expression, calc_t *calc)
 {
 	double num = 0;
 	char *ret = (char *)expression;
-	int push_status = 0;
+	
+	assert(NULL != calc);
+	assert(NULL != expression);
 	
 	num = strtod(expression, &ret);
 	
-	push_status = StackPush(calc->num, &num);
-	if (0 == push_status)
+	if (!StackPush(calc->num, &num))
 	{
-		calc->calc_lut->next_state = ERROR;
+		calc->calc_lut[(int)*ret].next_state = ERROR;
 	}
 	
 	return ret;
@@ -141,16 +155,18 @@ static char *CalcHandleNum(const char *expression, calc_t *calc)
 static char *CalcHandleCloseParenthesis(const char *expression, calc_t *calc)
 {
 	char *runner = NULL;
-	int folder_status = 0;
+	
+	assert(NULL != calc);
+	assert(NULL != expression);
 	
 	runner = (char *)expression;
 
 	while (!(StackIsEmpty(calc->ops)) && '(' != (int)*(char *)StackPeek(calc->ops))
 	{
-		folder_status = CalcFold(calc);
-		if (0 == folder_status)
+		
+		if (!CalcFold(calc))
 		{
-			calc->calc_lut->next_state = ERROR;
+			calc->calc_lut[(int)*runner].next_state = ERROR;
 		}
 	}
 	
@@ -162,14 +178,15 @@ static char *CalcHandleCloseParenthesis(const char *expression, calc_t *calc)
 static char *CalcHandleOpeneParenthesis(const char *expression, calc_t *calc)
 {
 	char *runner = NULL;
-	int push_status = 0;
+	
+	assert(NULL != calc);
+	assert(NULL != expression);
 	
 	runner = (char *)expression;
 	
-	push_status = StackPush(calc->ops, expression);
-	if (0 == push_status)
+	if (!StackPush(calc->ops, runner))
 	{
-		calc->calc_lut->next_state = ERROR;
+		calc->calc_lut[(int)*runner].next_state = ERROR;
 	}
 	
 	return ++runner;
@@ -177,13 +194,16 @@ static char *CalcHandleOpeneParenthesis(const char *expression, calc_t *calc)
 
 static char *CalcHandlePow(const char *expression, calc_t *calc)
 {
-	int push_status = 0;
-	char *runner = (char *)expression;
+	char *runner = NULL;
 	
-	push_status = StackPush(calc->ops, expression);
-	if (0 == push_status)
+	assert(NULL != calc);
+	assert(NULL != expression);
+	
+	runner = (char *)expression;
+	
+	if (!StackPush(calc->ops, runner))
 	{
-		calc->calc_lut->next_state = ERROR;
+		calc->calc_lut[(int)*runner].next_state = ERROR;
 	}
 	
 	return ++runner;
@@ -192,7 +212,12 @@ static char *CalcHandlePow(const char *expression, calc_t *calc)
 static char *CalcHandleOp(const char *expression, calc_t *calc)
 {
 	int push_status = 0;
-	char *runner = (char *)expression;
+	char *runner = NULL;
+	
+	assert(NULL != calc);
+	assert(NULL != expression);
+	
+	runner = (char *)expression;
 	
 	while (!(StackIsEmpty(calc->ops)) && (calc->op_lut[(int)*runner].presedence <= 
 					calc->op_lut[(int)*(char *)StackPeek(calc->ops)].presedence))
@@ -200,11 +225,9 @@ static char *CalcHandleOp(const char *expression, calc_t *calc)
 		push_status = CalcFold(calc);
 	}
 	
-	push_status = StackPush(calc->ops, expression);
-	
-	if (0 == push_status)
+	if (!StackPush(calc->ops, runner))
 	{
-		calc->calc_lut->next_state = ERROR;
+		calc->calc_lut[(int)*runner].next_state = ERROR;
 	}
 	
 	return ++runner;
@@ -213,110 +236,103 @@ static char *CalcHandleOp(const char *expression, calc_t *calc)
 static void CalcLutInit(calc_state_t *calc_lut)
 {
 	unsigned int i = 0;
-	calc_state_t *runner = NULL;
 
-	assert(NULL != calc_lut);	
-
-	runner = calc_lut;
+	assert(NULL != calc_lut);
 		
-	while (i < (ASCII_SIZE * STATES_NUM))
+	for (i = 0; i < (ASCII_SIZE * STATES_NUM); ++i)
 	{
-		runner->next_state = ERROR;
-		runner->handle_func = &DoNothing;
-		++runner;
-		++i;
+		calc_lut[i].next_state = ERROR;
+		calc_lut[i].handle_func = &DoNothing;
 	}
-	
-	runner = calc_lut;
 	
 	for (i = '0'; i <= '9'; ++i)
 	{
-		runner[i + (ASCII_SIZE * WAIT_FOR_NUM)].next_state = WAIT_FOR_OP;
-		runner[i + (ASCII_SIZE * WAIT_FOR_NUM)].handle_func = &CalcHandleNum;
+		calc_lut[i + (ASCII_SIZE * WAIT_FOR_NUM)].next_state = WAIT_FOR_OP;
+		calc_lut[i + (ASCII_SIZE * WAIT_FOR_NUM)].handle_func = &CalcHandleNum;
 	}
 	
 	/* WAIT_FOR_NUM init */
-	runner['.' + (ASCII_SIZE * WAIT_FOR_NUM)].next_state = WAIT_FOR_OP;
-	runner['.' + (ASCII_SIZE * WAIT_FOR_NUM)].handle_func = &CalcHandleNum;
+	calc_lut['.' + (ASCII_SIZE * WAIT_FOR_NUM)].next_state = WAIT_FOR_OP;
+	calc_lut['.' + (ASCII_SIZE * WAIT_FOR_NUM)].handle_func = &CalcHandleNum;
 	
-	runner['+' + (ASCII_SIZE * WAIT_FOR_NUM)].next_state = WAIT_FOR_OP;
-	runner['+' + (ASCII_SIZE * WAIT_FOR_NUM)].handle_func = &CalcHandleNum;
+	calc_lut['+' + (ASCII_SIZE * WAIT_FOR_NUM)].next_state = WAIT_FOR_OP;
+	calc_lut['+' + (ASCII_SIZE * WAIT_FOR_NUM)].handle_func = &CalcHandleNum;
 	
-	runner['-' + (ASCII_SIZE * WAIT_FOR_NUM)].next_state = WAIT_FOR_OP;
-	runner['-' + (ASCII_SIZE * WAIT_FOR_NUM)].handle_func = &CalcHandleNum;
+	calc_lut['-' + (ASCII_SIZE * WAIT_FOR_NUM)].next_state = WAIT_FOR_OP;
+	calc_lut['-' + (ASCII_SIZE * WAIT_FOR_NUM)].handle_func = &CalcHandleNum;
 	
-	runner['(' + (ASCII_SIZE * WAIT_FOR_NUM)].next_state = WAIT_FOR_NUM;
-	runner['(' + (ASCII_SIZE * WAIT_FOR_NUM)].handle_func = &CalcHandleOpeneParenthesis;
+	calc_lut['(' + (ASCII_SIZE * WAIT_FOR_NUM)].next_state = WAIT_FOR_NUM;
+	calc_lut['(' + (ASCII_SIZE * WAIT_FOR_NUM)].handle_func = &CalcHandleOpeneParenthesis;
 	
-	runner[' ' + (ASCII_SIZE * WAIT_FOR_NUM)].next_state = WAIT_FOR_NUM;
-	runner[' ' + (ASCII_SIZE * WAIT_FOR_NUM)].handle_func = &HandleSpace;
+	calc_lut[' ' + (ASCII_SIZE * WAIT_FOR_NUM)].next_state = WAIT_FOR_NUM;
+	calc_lut[' ' + (ASCII_SIZE * WAIT_FOR_NUM)].handle_func = &HandleSpace;
 	
 	/* WAIT_FOR_OP init */
-	runner['+' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = WAIT_FOR_NUM;
-	runner['+' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &CalcHandleOp;
+	calc_lut['+' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = WAIT_FOR_NUM;
+	calc_lut['+' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &CalcHandleOp;
 	
-	runner['-' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = WAIT_FOR_NUM;
-	runner['-' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &CalcHandleOp;
+	calc_lut['-' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = WAIT_FOR_NUM;
+	calc_lut['-' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &CalcHandleOp;
 		
-	runner['/' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = WAIT_FOR_NUM;
-	runner['/' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &CalcHandleOp;
+	calc_lut['/' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = WAIT_FOR_NUM;
+	calc_lut['/' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &CalcHandleOp;
 		
-	runner['*' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = WAIT_FOR_NUM;
-	runner['*' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &CalcHandleOp;
+	calc_lut['*' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = WAIT_FOR_NUM;
+	calc_lut['*' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &CalcHandleOp;
 		
-	runner['^' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = WAIT_FOR_NUM;
-	runner['^' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &CalcHandlePow;
+	calc_lut['^' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = WAIT_FOR_NUM;
+	calc_lut['^' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &CalcHandlePow;
 	
-	runner[')' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = WAIT_FOR_OP;
-	runner[')' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &CalcHandleCloseParenthesis;
+	calc_lut[')' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = WAIT_FOR_OP;
+	calc_lut[')' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &CalcHandleCloseParenthesis;
 	
-	runner[' ' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = WAIT_FOR_OP;
-	runner[' ' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &HandleSpace;
+	calc_lut[' ' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = WAIT_FOR_OP;
+	calc_lut[' ' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &HandleSpace;
 	
-	runner['\0' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = END;
-	runner['\0' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &CalcHandleOp;
+	calc_lut['\0' + (ASCII_SIZE * WAIT_FOR_OP)].next_state = END;
+	calc_lut['\0' + (ASCII_SIZE * WAIT_FOR_OP)].handle_func = &CalcHandleOp;
 }
 
 static void OpLutInit(calc_op_t *op_lut)
 {
-	calc_op_t *runner = NULL;
 	unsigned int i = 0;
 	
 	assert(NULL != op_lut);
 	
-	runner = op_lut;
-	
-	while (i < ASCII_SIZE)
+	for (i = 0; i < ASCII_SIZE; ++i)
 	{
-		runner->op_func = &NotOp;
-		runner->presedence = 0;
-		++runner;
-		++i;
+		op_lut[i].op_func = &Dummy;
+		op_lut[i].presedence = 0;
 	}
 	
-	runner = op_lut;
+	op_lut['+'].op_func = &CalcAdd;
+	op_lut['+'].presedence = ADD_AND_SUB;
 	
-	runner['+'].op_func = &CalcAdd;
-	runner['+'].presedence = ADD_AND_SUB;
+	op_lut['-'].op_func = &CalcSub;
+	op_lut['-'].presedence = ADD_AND_SUB;
 	
-	runner['-'].op_func = &CalcSub;
-	runner['-'].presedence = ADD_AND_SUB;
+	op_lut['*'].op_func = &CalcMult;
+	op_lut['*'].presedence = MULT_AND_DIFF;
 	
-	runner['*'].op_func = &CalcMult;
-	runner['*'].presedence = MULT_AND_DIFF;
+	op_lut['/'].op_func = &CalcDiff;
+	op_lut['/'].presedence = MULT_AND_DIFF;
 	
-	runner['/'].op_func = &CalcDiff;
-	runner['/'].presedence = MULT_AND_DIFF;
+	op_lut['^'].op_func = &CalcPow;
+	op_lut['^'].presedence = POWER;
 	
-	runner['^'].op_func = &CalcPow;
-	runner['^'].presedence = POWER;
+	op_lut['\0'].presedence = END;
 	
-	runner['\0'].presedence = END;
+	op_lut['('].presedence = OPEN_PARENTHESIS;
 }
 
 calc_t *CalcInit(const char *expression, double *result)
 {
-	calc_t *new_calc = (calc_t *)malloc(sizeof(calc_t));
+	calc_t *new_calc = NULL;
+	
+	assert(NULL != result);
+	assert(NULL != expression);
+	
+	new_calc = (calc_t *)malloc(sizeof(calc_t));
 	if (NULL == new_calc)
 	{
 		return NULL;
@@ -346,8 +362,6 @@ calc_t *CalcInit(const char *expression, double *result)
 		return NULL;
 	}
 	
-	CalcLutInit(new_calc->calc_lut);
-	
 	new_calc->op_lut = (calc_op_t *)malloc(sizeof(calc_op_t) * ASCII_SIZE);
 	if (NULL == new_calc->calc_lut)
 	{
@@ -358,6 +372,7 @@ calc_t *CalcInit(const char *expression, double *result)
 		return NULL;
 	}
 	
+	CalcLutInit(new_calc->calc_lut);
 	OpLutInit(new_calc->op_lut);
 	
 	new_calc->result = result;
@@ -367,6 +382,8 @@ calc_t *CalcInit(const char *expression, double *result)
 
 void CalcDestroy(calc_t *calc)
 {
+	assert(NULL != calc);
+	
 	FREE(calc->op_lut);
 	FREE(calc->calc_lut);
 	

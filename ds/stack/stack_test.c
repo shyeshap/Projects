@@ -77,10 +77,28 @@ void TestCreate()
 	StackDestroy(mystack);
 }
 
+void TestSortRec()
+{
+	stack_t *stack;
+	int n1 = 10, n2 = 5, n3 = 7;
+	
+	stack = StackCreate(4, 8);
+	StackPush(stack, &n1);
+	StackPush(stack, &n2);
+	StackPush(stack, &n3);
+	
+	StackSortRec(stack);
+	
+	while (!StackIsEmpty(stack))
+	{
+		printf("%d\n", *(int *)StackPop(stack));
+	}
+}
 
 int main()
 {
 	TestCreate();
+	TestSortRec();
 	
 	return 0;
 }
