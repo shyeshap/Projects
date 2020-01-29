@@ -30,15 +30,16 @@ vector_t *VectorCreate(size_t element_size, size_t capacity)
 	vector_t *new_vector = NULL;
 	
 	new_vector = (vector_t *)malloc(sizeof(vector_t));
-	if (NULL == new_vector)
+	if (NULL != new_vector)
 	{
 		start = (void *)malloc(element_size * capacity);
 		if (NULL == start)
 		{
+			free(new_vector); new_vector = NULL;
+			
 			return NULL; 
 		}
-		
-		return NULL;
+
 	} 
 	
 	new_vector->start = start;
@@ -93,8 +94,7 @@ int VectorPushBack(vector_t *vector, const void *data)
 	void *current = NULL;
 
 	assert(NULL != vector);
-	assert(NULL != data);
-	
+
 	if (vector->size == vector->capacity)
 	{
 		status = VectorReserve(vector, vector->capacity * GROWTH_FACTOR);
@@ -110,17 +110,20 @@ int VectorPushBack(vector_t *vector, const void *data)
 
 void VectorPopBack(vector_t *vector)
 {
-	--vector->size;
-	
-	if (vector->size == vector->capacity / SHRINK_POINT)
+	if (0 < vector->size)
 	{
-		VectorReserve(vector, vector->capacity / SHRINK_FACTOR);
+		--vector->size;
+	
+		if (vector->size == vector->capacity / SHRINK_POINT)
+		{
+			VectorReserve(vector, vector->capacity / SHRINK_FACTOR);
+		}
 	}
 }
 
 void *VectorGetItemAddress(const vector_t *vector, int position)
 {
-		return ((char *)vector->start + ((position - 1) * 
+	return ((char *)vector->start + ((position - 1) * 
 											vector->element_size));
 }
 

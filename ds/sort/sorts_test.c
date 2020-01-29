@@ -29,6 +29,11 @@ clock_t start_t, end_t;
 double total_t;
 int min = 0, max = 10000;
 
+static int comp(const void *element1, const void *element2)
+{
+	return (*(int *)element1 - *(int *)element2);
+}
+
 int FindMin(int arr[], size_t size)
 {
 	size_t i = 0;
@@ -233,13 +238,42 @@ void TestRadix()
 	printf("QSORT: Total time taken by CPU: %f\n", total_t);
 	
 	TEST(0 == memcmp(arr, arr_cpy, size), "radix");
-	
+}
+
+void TestMerge()
+{
+	int src[] = {4,1,7,9,2,5};
+	int dst[] = {0,0,0,0,0,0};
+	size_t size = 6, i = 0;
+
+	MergeSort(src, dst, size);
+
+	while (i < size)
+	{
+		printf("%d\n", dst[i]);
+
+		++i;
+	}
+}
+
+void TestQuick()
+{
+	int arr[] = {10, 7,234,6,24,76,32,5,2, 5,1,47, 257, 873214};
+	size_t i = 0, size = 14;
+
+	Quicksort(arr, size, 4, comp);
+
+	while(i < size)
+	{
+		printf("%d\n", arr[i]);
+		++i;
+	}
 
 }
 
 int main()
 {	
-	arr = (int *)malloc(size * sizeof(int));
+	/*arr = (int *)malloc(size * sizeof(int));
 	sorted_arr = (int *)malloc(sizeof(int) * size);
 	arr_cpy = (int *)malloc(size * sizeof(int));
 	
@@ -248,9 +282,11 @@ int main()
 	TestSelection();
 	TestCount();
 	TestRadix();
-	
-	free(arr);
+	TestMerge();*/
+	TestQuick();
+
+	/*free(arr);
 	free(sorted_arr);
-	
+	*/
 	return 0;
 }

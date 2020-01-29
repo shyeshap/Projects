@@ -10,17 +10,17 @@
 int main()
 {
 
-char file[MAX_FILE_LEN];
-match arr[ELEMEN_NUM];
+	char file[MAX_FILE_LEN];
+	match arr[ELEMEN_NUM];
 
-InitializArr(arr);
+	InitializArr(arr);
 
-printf("plesae enter file's full name:\n");
-scanf("%s%*c", file);
+	printf("plesae enter file's full name:\n");
+	scanf("%s%*c", file);
 
-InfraStruct(file, arr);
+	InfraStruct(file, arr);
 
-return 0;
+	return 0;
 }
 
 

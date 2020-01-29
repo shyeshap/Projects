@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 
+typedef int (*comp_func_t)(const void *, const void *);
 /* complexity: O(n^2) */
 void BubbleSort(int *arr, size_t size);
 
@@ -24,5 +25,10 @@ void PrintArr(int *arr, size_t size);
 int FindMin(int arr[], size_t size);
 
 int FindMax(int arr[], size_t size);
+
+void MergeSort(int *src_arr, int *dest_arr, size_t size);
+
+void Quicksort(void *arr, size_t nmemb, size_t element_size,
+                 							 comp_func_t cmp_func);
 
 #endif
