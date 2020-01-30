@@ -38,7 +38,7 @@ void TrieDestroy(trie_t *trie);
 * undefined behaviour for @trie NULL pointer
 * complexity: malloc();                  
 */
-status_t TrieInsert(trie_t *trie, void *data);
+status_t TrieInsert(trie_t *trie, char *data);
 
 /*
 * TrieIsEmpty() -
@@ -53,7 +53,7 @@ bool_t TrieIsEmpty(const trie_t *trie);
 
 /*
 * TrieSize() -
-* Counts the number of elements in the trie.
+* Counts the number of edges in the trie.
 * undefined behaviour for @trie NULL pointer
 * complexity: O(n);                  
 */
@@ -66,6 +66,24 @@ size_t TrieSize(const trie_t *trie);
 * complexity: O(n);                  
 */
 size_t TrieCountLeafs(const trie_t *trie);
+
+/*
+* TrieFreeNode() - 
+* updates the availability of node to be freed and its ansestors.
+* undefined behaviour for @trie NULL pointer
+* undefined behaviour for @data NULL pointer or not leaf path.
+* complexity: O(n)
+*/
+void TrieFreeLeaf(trie_t *trie, char *data);
+
+/*
+* TrieIsAvailable()
+* Check if node is available
+* undefined behaviour for @trie NULL pointer.
+* undefined behaviour for @data NULL pointer.
+* complexity: O(n)
+*/
+bool_t TrieIsAvailable(trie_t *trie, char *data);
 
 #endif 
 

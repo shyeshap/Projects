@@ -110,6 +110,7 @@ unsigned int ByteMirror(unsigned int x)
 	x = ((x & m9) >> 1) | ((x & m10) << 1);
 	return x; 	
 }
+
 /***Ex6 A***/
 int Is2n6On(unsigned char c)
 {

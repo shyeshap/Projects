@@ -30,7 +30,7 @@ static int comp(const void *element1, const void *element2, const void *param)
 void TestBinary()
 {
 	int arr[] = {1,2,3,4,5,6,7,8,9};
-	int d1 = 5, d2 = 2, d3 = 6, d4 = 9, d5 = 10; 
+	int d1 = 5, d2 = 2, d3 = 6, d4 = 9, d5 = 10, d6 = 0, d7 = 1, d8 = 8, d9 = 3; 
 
 	TEST(d1 == *(int *)BinarySearch(arr, 4, 9, comp, &d1, NULL), "search 1");
 	TEST(d2 == *(int *)BinarySearch(arr, 4, 9, comp, &d2, NULL), "search 2");
@@ -43,6 +43,11 @@ void TestBinary()
 	TEST(d3 == *(int *)JumpSearch(arr, 4, 9, comp, &d3, NULL), "search 6");
 	TEST(d4 == *(int *)JumpSearch(arr, 4, 9, comp, &d4, NULL), "search 9");
 	TEST(NULL == JumpSearch(arr, 4, 9, comp, &d5, NULL), "search 10");
+
+	TEST(NULL == JumpSearch(arr, 4, 9, comp, &d6, NULL), "search 9");
+	TEST(d7 == *(int *)JumpSearch(arr, 4, 9, comp, &d7, NULL), "search 9");
+	TEST(d8 == *(int *)JumpSearch(arr, 4, 9, comp, &d8, NULL), "search 9");
+	TEST(d9 == *(int *)JumpSearch(arr, 4, 9, comp, &d9, NULL), "search 9");
 
 }
 
