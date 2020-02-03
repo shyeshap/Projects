@@ -13,7 +13,7 @@
 #define FREE(ptr) free(ptr); ptr = NULL;
 
 #define m1 0xF0
-#define m2 0xCC
+#define m2 0xCC  
 #define m3 0xAA
 
 #define BITS_IN_BYTE 8
@@ -43,11 +43,13 @@ void IPConvertAddress(ip_t ip_address, unsigned char *ip_str)
 	*runner = '\0';
 }
 
+void IPConvertAddressBack(ip_t ip_address, unsigned char *ip_str)
+
 static unsigned char ByteMirror(unsigned char x)
 {
-	x = ((x & m1) >> 4)  | ((x & ~m1) << 4);
-	x = ((x & m2) >> 2)  | ((x & ~m2) << 2);
-	x = ((x & m3) >> 1)  | ((x & ~m3) << 1);
+	x = ((x & m1) >> 4) | ((x & ~m1) << 4);
+	x = ((x & m2) >> 2) | ((x & ~m2) << 2);
+	x = ((x & m3) >> 1) | ((x & ~m3) << 1);
 	
 	return x; 	
 }

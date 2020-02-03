@@ -5,13 +5,14 @@
 
 #define ADDRESS_SIZE_IN_BYTES 4
 
-typedef unsigned char ip_t[ADDRESS_SIZE_IN_BYTES];
-
 /* IPConvertAddress()
 * converts ip_address to string of bits.
 * complication: O(n);
 */
 void IPConvertAddress(ip_t ip_address, unsigned char *ip_str);
+
+void IPConvertAdressToIP(ip_t ip_address, unsigned char *ip_str);
+
 
 #endif 
 
