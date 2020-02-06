@@ -17,7 +17,7 @@
 #define BITS_IN_BYTE 8
 #define IP_SIZE sizeof(ip_t)
 #define IP_ARR_SIZE (IP_SIZE * BITS_IN_BYTE)
-#define MAX 255
+#define MAX 0xFF
 #define MIN 0
 
 
@@ -60,7 +60,7 @@ dhcp_t *DhcpCreate(ip_t subnet_mask, size_t subnet_mask_reserved_bits)
 	}
 
 	status = CatchReservedAddresses(new_dhcp->trie);
-	if (0 != status)
+	if (SUCCESS != status)
 	{
 		return NULL;
 	}
@@ -82,6 +82,11 @@ alc_status_t DhcpAllocIp(dhcp_t *dhcp, ip_t requested_ip, ip_t allocated_ip)
 	bool_t is_avilable = TRUE;
 	status_t status = SUCCESS;
 	
+	if (TrieCountOccupiedLeafs(dhcp->trie) == pow(2, dhcp->available_bits))
+	{
+		return FAIL_TO_ALLOC;
+	}
+
 	memcpy(allocated_ip, requested_ip, IP_SIZE);
 	is_avilable = TrieIsAvailable(dhcp->trie, requested_ip);
 	if (FALSE == is_avilable)
@@ -90,7 +95,7 @@ alc_status_t DhcpAllocIp(dhcp_t *dhcp, ip_t requested_ip, ip_t allocated_ip)
 	}
 	
 	status = TrieInsert(dhcp->trie, allocated_ip);
-	if (0 != status)
+	if (SUCCESS != status)
 	{
 		return FAIL_TO_ALLOC;
 	}
@@ -126,5 +131,5 @@ static status_t CatchReservedAddresses(trie_t *trie)
 	status += TrieInsert(trie, last_ip);
 	status += TrieInsert(trie, extra_ip);
 
-	return (0 < status);
+	return (SUCCESS < status);
 }

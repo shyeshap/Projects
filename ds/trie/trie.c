@@ -66,6 +66,12 @@ trie_t *TrieCreate(size_t height)
 	}
 
 	new_tree->root = CreateNodeIMP();
+	if (NULL == new_tree->root)
+	{
+		FREE(new_tree);
+		return NULL;
+	}
+	
 	new_tree->height = height;
 
 	return new_tree;
@@ -76,6 +82,7 @@ void TrieDestroy(trie_t *trie)
 	assert(NULL != trie);
 
 	DestroyIMP(trie->root);
+	trie->root = NULL;
 
 	FREE(trie);
 }
@@ -84,15 +91,6 @@ status_t TrieInsert(trie_t *trie, unsigned char *data)
 {
 	assert(NULL != trie);
 	assert(NULL != data);
-
-	if (NULL == trie->root)
-	{
-		trie->root = CreateNodeIMP();
-		if (NULL == trie->root)
-		{
-			return FAIL;
-		}
-	}
 
 	return InsertIMP(trie->root, data, trie->height);
 }
@@ -149,23 +147,24 @@ void TrieFindFirstAvailable(trie_t *trie, unsigned char *data)
 
 static void FindFirstAvailableIMP(trie_node_t *node, unsigned char *data, size_t height)
 {
+	size_t side = LEFT;
+
 	if (NULL == node || 0 == height)
 	{
 		return;
 	}
 
-	if (NULL != node->direction[LEFT] && 
-		NOT_AVAILABLE == node->direction[LEFT]->avail)
+	if (NULL != node->direction[side] && 
+		NOT_AVAILABLE == node->direction[side]->avail)
 	{
 		*(data + ((IP_SIZE - height) / BITS_IN_BYTE)) |=
 				(MASK_1 << ((height - 1) % BITS_IN_BYTE));  
-	
-		FindFirstAvailableIMP(node->direction[RIGHT], data, height - 1);
+		side = RIGHT;
 	}
 
 	else
 	{
-		FindFirstAvailableIMP(node->direction[LEFT], data, height - 1);
+		FindFirstAvailableIMP(node->direction[side], data, height - 1);
 	}
 }
 
@@ -200,13 +199,6 @@ static size_t CountOccupiedLeafsIMP(trie_node_t *node)
 		NOT_AVAILABLE == node->avail)
 	{
 		return 1;
-	}
-
-	else if(NULL == node->direction[LEFT]  && 
-			NULL == node->direction[RIGHT] && 
-			AVAILABLE == node->avail)
-	{
-		return 0;
 	}
 
 	return (CountOccupiedLeafsIMP(node->direction[LEFT]) + 

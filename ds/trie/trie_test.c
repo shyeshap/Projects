@@ -28,7 +28,6 @@ void TestInsert()
 	unsigned char buff[4] = {1,2,3,4};
 	trie_t *trie = TrieCreate(8);
 
-	TEST(1 ==  TrieIsEmpty(trie), "empty");
 	TEST(0 == TrieCountEdges(trie), "size = 0");
 	TEST(0 == TrieInsert(trie, d1), "insert d1");
 	TEST(8 == TrieCountEdges(trie), "edges num = 8");

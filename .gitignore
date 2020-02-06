@@ -5,3 +5,5 @@
 !**.h
 !.gitignore
 !**.md
+!**.mk
+!makefile

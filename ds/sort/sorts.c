@@ -189,19 +189,6 @@ void MergeSort(int *src_arr, int *dest_arr, size_t size)
 	MergeDevide(src_arr, dest_arr, 0, size - 1);
 }
 
-static void MergeDevide(int *src_arr, int *dest_arr, size_t first_in, size_t last_in)
-{
-	size_t mid_in = 0;
-	
-	if (first_in < last_in) 
-	{
-		mid_in = (first_in + last_in) / 2;
-		MergeDevide(src_arr, dest_arr, first_in, mid_in);
-		MergeDevide(src_arr, dest_arr, (mid_in + 1), last_in);
-		Merge(src_arr, dest_arr, first_in, mid_in, last_in);
-	}
-}
-
 void Quicksort(void *arr, size_t nmemb, size_t element_size,
                  							 comp_func_t cmp_func)
 {
@@ -229,17 +216,20 @@ static size_t PartitionIMP(void *arr, size_t low_in, size_t high_in, size_t elem
 
 	while(1)
 	{
-		while (0 > cmp_func((byte_t)arr + (low_in * element_size), (byte_t)arr + (high_in * element_size)))
+		while (0 > cmp_func((byte_t)arr + (low_in * element_size), 
+							(byte_t)arr + (high_in * element_size)))
 		{
 			++low_in;
 		} 
 		
-		while (0 > cmp_func((byte_t)arr + (pivot_in * element_size), (byte_t)arr + (high_in * element_size)))
+		while (0 > cmp_func((byte_t)arr + (pivot_in * element_size), 
+							(byte_t)arr + (high_in * element_size)))
 		{
 			--high_in;
 		} 
 
-		if (0 <= cmp_func((byte_t)arr + (high_in * element_size), (byte_t)arr + (low_in * element_size)))
+		if (0 <= cmp_func((byte_t)arr + (high_in * element_size), 
+							(byte_t)arr + (low_in * element_size)))
 		{
 			return high_in;
 		}
@@ -282,6 +272,19 @@ static size_t MedianOfThreeIMP(void *arr, size_t low_in, size_t high_in, size_t 
 	return high_in;
 }
 	
+static void MergeDevide(int *src_arr, int *dest_arr, size_t first_in, size_t last_in)
+{
+	size_t mid_in = 0;
+	
+	if (first_in < last_in) 
+	{
+		mid_in = (first_in + last_in) / 2;
+		MergeDevide(src_arr, dest_arr, first_in, mid_in);
+		MergeDevide(src_arr, dest_arr, (mid_in + 1), last_in);
+		Merge(src_arr, dest_arr, first_in, mid_in, last_in);
+	}
+}
+
 static void Merge(int *src_arr, int *dest_arr, size_t first_in, size_t mid_in, size_t last_in)
 {
 		size_t left = first_in, right = mid_in + 1, dst_in = first_in;
