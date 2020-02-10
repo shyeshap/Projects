@@ -11,9 +11,9 @@
 #include "trie.h" /*trie API */
 
 #define FREE(ptr) free(ptr); ptr = NULL;
-#define MASK_1 1
-#define BITS_IN_BYTE 8
-#define IP_ARR_SIZE 4
+#define MASK_1 (1)
+#define BITS_IN_BYTE (8)
+#define IP_ARR_SIZE (4)
 #define IP_SIZE (IP_ARR_SIZE * BITS_IN_BYTE)
 
 typedef enum ChildSide
