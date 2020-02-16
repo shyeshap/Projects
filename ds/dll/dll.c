@@ -9,7 +9,7 @@
 #include <stdlib.h> /* malloc */
 #include <assert.h> /* assert */
 
-#include "dll.h" /* double linked list functions */
+#include "./../include/dll.h" /* double linked list functions */
 
 #define FREE(x) free(x); x = NULL;
 

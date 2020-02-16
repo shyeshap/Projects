@@ -103,7 +103,8 @@ iterator_t DLLPushBack(dll_t *dll, void *data);
 
 /**********************************************************************/
 /* Removes the iterator sent to it from the end of the data structure */
-/* complexity O(1)                                                    */
+/* complexity O(1)*/
+/* return its data                                                    */
 /**********************************************************************/
 void *DLLPopBack(dll_t *dll);
 

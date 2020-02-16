@@ -1,13 +1,25 @@
 #include <stdio.h>			/* printf()	*/
-#include <unistd.h>	
 #include <pthread.h>		/* threads	*/
-#include <stdatomic.h>		/* atomic 	*/
 
 void *SumOfDividers(void *param);
 
-#define NUM (100)
-#define SIZE (20)
-volatile atomic_flag flag = ATOMIC_FLAG_INIT;
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define WHITE "\033[0m"
+#define BLUE "\x1b[34m"
+#define RESET "\033[0m"
+
+#define NUM (100000000)
+#define SIZE (1000)
+
+enum lock
+{
+	FREE,
+	LOCKED
+};
+
+int can_produce = FREE;
+int can_consume = LOCKED;
 
 size_t arr[NUM] = {0};
 
@@ -57,14 +69,14 @@ void *Producer(void *param)
 
 	for (j = 0; j < NUM; ++j)
 	{
-		while (atomic_flag_test_and_set(&flag));
+		while (__sync_lock_test_and_set(&can_produce, LOCKED));
 
 		for (i = 0; i < SIZE; ++i)
 		{
 			++arr[i];
 		}
 
-		atomic_flag_clear(&flag);
+		__sync_lock_release(&can_consume);
 	}
 
 	return NULL;
@@ -75,11 +87,11 @@ void *Consumer(void *param)
 	size_t i = 0, j = 0;
 	size_t sum = 0;
 	size_t n = 0;
-	
+
 	for (j = 0; j < NUM; ++j)
 	{
-		while (atomic_flag_test_and_set(&flag));
-
+		while (__sync_lock_test_and_set(&can_consume, LOCKED));
+		
 		for (i = 0; i < SIZE; ++i)
 		{
 			sum += arr[i];
@@ -88,16 +100,17 @@ void *Consumer(void *param)
 		n = arr[0];
 		if (sum / SIZE == n)
 		{
-			printf("SUCSSES %ld\n", n);
+			printf(GREEN "SUCSSES %ld\n" RESET, n);
 		}
 
 		else
 		{
-			printf("OH NO!! %ld\n", n);
+			printf(RED "OH NO!! %ld\n" RESET, n);
 		}
 		
 		sum = 0;
-		atomic_flag_clear(&flag);
+
+		__sync_lock_release(&can_produce);
 	}
 
 	return NULL;
