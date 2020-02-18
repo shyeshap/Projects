@@ -1,53 +1,49 @@
 #include <stdio.h>			/* printf() */
-#include <pthread.h>		/* threads	*/
-#include <time.h>			/* time ()	*/
-#include <stdlib.h>			/* srand()	*/
+#include <pthread.h>		/* pthread_	*/
 #include <semaphore.h>		/* sem_ 	*/
 
-#include "./../../ds/include/dll.h"
+#include "./../../include/circular_buffer.h"
+
+#define UNUSED(x) (void)(x)
+#define THREADS_NUM (30)
+#define CB_CAPACITY (10)
 
 typedef void *(*start_routine_t) (void *);
 
-/****** implementaion functions declaration ********/
-static void *Producer(void *param);
-static void *Consumer(void *param);
+/**************************************************************/
+static void *Producer(void *data);
+static void *Consumer(void *data);
 static void CreateThreads(pthread_t *thread, start_routine_t rutine, void *param);
-/***************************************************/
-
-#define TIMES (10000)
-
-enum lock
-{
-	UNLOCKED,
-	LOCKED
-};
+/**************************************************************/
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-sem_t sem = {0};
-pthread_t prod_thread[TIMES] = {0}, cons_thread[TIMES] = {0};
-dll_t *dll = NULL;
+cbuffer_t *cb = NULL;
+sem_t sem_write = {0}, sem_read = {0};
 
 int main()
 {
-	int status = 0;
+	pthread_t prod_thread[THREADS_NUM] = {0}, 
+			  cons_thread[THREADS_NUM] = {0};
+	size_t data_arr[THREADS_NUM] = {0};
 	size_t i = 0;
-	size_t data_arr[TIMES] = {0};
+	int status = 0;
 	
-	dll = DLLCreate();
-	sem_init(&sem, 0, 0);
+	cb = CBufferCreate(CB_CAPACITY);
+	sem_init(&sem_write, 0, CB_CAPACITY);
+	sem_init(&sem_read, 0, 0);
 
-	for (i = 0; i < TIMES; ++i)
+	for (i = 0; i < THREADS_NUM; ++i)
 	{
 		data_arr[i] = i;
 	}
 
-	for (i = 0; i < TIMES; ++i)
+	for (i = 0; i < THREADS_NUM; ++i)
 	{
 		CreateThreads(&prod_thread[i], &Producer, &data_arr[i]);
-		CreateThreads(&cons_thread[i], &Consumer, &data_arr[i]);
+		CreateThreads(&cons_thread[i], &Consumer, NULL);
 	}
 
-	for (i = 0; i < TIMES; ++i)
+	for (i = 0; i < THREADS_NUM; ++i)
 	{
 		status = pthread_join(prod_thread[i], NULL);
 		if (0 != status)
@@ -64,30 +60,36 @@ int main()
 		}
 	}
 
-	DLLDestroy(dll);
+	CBufferDestroy(cb);
 	pthread_mutex_destroy(&mutex);
 
 	return 0;
 }
 
-/************************************************************/
+/**********************************************************/
 static void *Producer(void *data)
 {
+	sem_wait(&sem_write);
 	pthread_mutex_lock(&mutex);
-	DLLPushFront(dll, data);
-	printf("PUSH: %lu\n", *(size_t *)DLLGetData(DLLBegin(dll)));
-	sem_post(&sem);
+	printf("W: %d\n", *(int *)data);
+	CBufferWrite(cb, *(int *)data);
 	pthread_mutex_unlock(&mutex);
+	sem_post(&sem_read);
 
 	return NULL;
 }
 
 static void *Consumer(void *data)
 {
-	sem_wait(&sem);
+	int read = 0;
+	UNUSED(data);
+
+	sem_wait(&sem_read);
 	pthread_mutex_lock(&mutex);
-	printf("POP: %lu\n", *(size_t *)DLLPopBack(dll));
+	read = CBufferRead(cb);
+	printf("R: %d\n", read);
 	pthread_mutex_unlock(&mutex);
+	sem_post(&sem_write);
 
 	return NULL;
 }

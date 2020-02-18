@@ -2,7 +2,10 @@
 #include <pthread.h>		/* pthread_	*/
 #include <semaphore.h>		/* sem_ 	*/
 
-#define NUM_OF_CONSUMERS (100)
+#define GREEN "\033[32m"
+#define RESET "\033[0m"
+
+#define NUM_OF_CONSUMERS (5)
 
 /**************************************************************/
 static void *Producer(void *data);
@@ -11,6 +14,7 @@ static void *Consumer(void *data);
 
 int waiting_threads = 0;
 int global = 0;
+int producer_done = 1;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 sem_t sem = {0};
@@ -73,27 +77,18 @@ static void *Producer(void *data)
 
 	while (1)
 	{
-		global = global + NUM_OF_CONSUMERS;
-		printf("%d\n", global);
-	
-		pthread_mutex_lock(&mutex);
-
-		while(NUM_OF_CONSUMERS != waiting_threads)
-		{
-			pthread_mutex_unlock(&mutex);
-			pthread_mutex_lock(&mutex);
-		}
-
-		waiting_threads = 0;
-		pthread_cond_broadcast(&cond);
-
-		pthread_mutex_unlock(&mutex);
-
 		for (i = 0; i < NUM_OF_CONSUMERS; ++i)
 		{
 			sem_wait(&sem);
 		}
 
+		pthread_mutex_lock(&mutex);
+
+		++global;
+		printf(GREEN "producer: %d\n" RESET, global);
+		pthread_cond_broadcast(&cond);
+
+		pthread_mutex_unlock(&mutex);
 	}
 	
 	return NULL;
@@ -103,15 +98,18 @@ static void *Consumer(void *data)
 {
 	while (1)
 	{
-		int local = 0;
+		int local = global;
 
 		pthread_mutex_lock(&mutex);
-		++waiting_threads;
-		pthread_cond_wait(&cond, &mutex);
-		local = --global;
+		sem_post(&sem);
+
+		while (global == local)
+		{
+			pthread_cond_wait(&cond, &mutex);
+		}
+
 		printf("consumer: %d\n", local);
 		pthread_mutex_unlock(&mutex);
-		sem_post(&sem);
 	}
 
 	return NULL;

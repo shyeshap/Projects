@@ -5,12 +5,16 @@
 
 #include "./../../ds/include/dll.h"
 
+typedef void *(*start_routine_t) (void *);
+
 /****** implementaion functions declaration ********/
 static void *Producer(void *param);
 static void *Consumer(void *param);
+static void CreateThreads(pthread_t *thread, start_routine_t rutine, void *param);
 /***************************************************/
 
-#define TIMES 1000
+#define TIMES (15000)
+#define TICKS (12000000)
 
 enum lock
 {
@@ -36,17 +40,8 @@ int main()
 
 	for (i = 0; i < TIMES; ++i)
 	{
-		status = pthread_create(&prod_thread[i], NULL, Producer, &data_arr[i]);
-		while (0 != status)
-		{
-			pthread_create(&prod_thread[i], NULL, Producer, &data_arr[i]);
-		}
-
-		status = pthread_create(&cons_thread[i], NULL, Consumer, &data_arr[i]);
-		while (0 != status)
-		{
-			pthread_create(&cons_thread[i], NULL, Consumer, &data_arr[i]);
-		}
+		CreateThreads(&prod_thread[i], Producer, &data_arr[i]);
+		CreateThreads(&cons_thread[i], Consumer, &data_arr[i]);
 	}
 
 	for (i = 0; i < TIMES; ++i)
@@ -85,9 +80,8 @@ static void *Producer(void *data)
 static void *Consumer(void *data)
 {
 	int start_time = clock();
-	int ms = 12000000;
 
-	while (clock() < start_time + ms)
+	while (clock() < (start_time + TICKS))
 	{
 		pthread_mutex_lock(&mutex);
 		
@@ -100,4 +94,15 @@ static void *Consumer(void *data)
 	}
 
 	return NULL;
+}
+
+static void CreateThreads(pthread_t *thread, start_routine_t rutine, void *param)
+{
+	int status = 0;
+
+	status = pthread_create(thread, NULL, rutine, param);
+	while (0 != status)
+	{
+		status = pthread_create(thread, NULL, rutine, param);
+	}
 }

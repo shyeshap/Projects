@@ -5,12 +5,21 @@ void *SumOfDividers(void *param);
 
 #define RED "\033[31m"
 #define GREEN "\033[32m"
-#define WHITE "\033[0m"
-#define BLUE "\x1b[34m"
 #define RESET "\033[0m"
 
 #define NUM (100000000)
 #define SIZE (1000)
+
+#define UNUSED(x) (void)(x)
+
+typedef void *(*start_routine_t) (void *);
+
+/************ implementation declerations **************/
+static void *Producer(void *param);
+static void *Consumer(void *param);
+static void CreateThreads(pthread_t *thread, start_routine_t);
+
+/*******************************************************/
 
 enum lock
 {
@@ -20,52 +29,39 @@ enum lock
 
 int can_produce = FREE;
 int can_consume = LOCKED;
-
 size_t arr[NUM] = {0};
-
-void *Producer(void *param);
-void *Consumer(void *param);
 
 int main()
 {
 	int status = 0;
-	pthread_t thread1 = 0, thread2 = 0;
+	pthread_t thread_prod = 0, thread_cons = 0;
 
-	status = pthread_create(&thread1, NULL, Producer, NULL);
+	CreateThreads(&thread_prod, Producer);
+	CreateThreads(&thread_cons, Consumer);
+
+	status = pthread_join(thread_prod, NULL);
 	if (0 != status)
 	{
-		printf("pthread1 create error \n");
+		printf("thread_prod join error \n");
 		return 1;
 	}
 
-	status = pthread_create(&thread2, NULL, Consumer, NULL);
+	status = pthread_join(thread_cons, NULL);
 	if (0 != status)
 	{
-		printf("pthread2 create error \n");
-		return 1;
-	}
-
-
-	status = pthread_join(thread1, NULL);
-	if (0 != status)
-	{
-		printf("pthread1 join error \n");
-		return 1;
-	}
-
-	pthread_join(thread2, NULL);
-	if (0 != status)
-	{
-		printf("pthread2 join error \n");
+		printf("thread_cons join error \n");
 		return 1;
 	}
 
 	return 0;
 }
 
-void *Producer(void *param)
+/*************implementation functions********************/
+static void *Producer(void *param)
 {
 	size_t i = 0, j = 0;
+
+	UNUSED(param);
 
 	for (j = 0; j < NUM; ++j)
 	{
@@ -82,11 +78,13 @@ void *Producer(void *param)
 	return NULL;
 }
 
-void *Consumer(void *param)
+static void *Consumer(void *param)
 {
 	size_t i = 0, j = 0;
 	size_t sum = 0;
 	size_t n = 0;
+
+	UNUSED(param);
 
 	for (j = 0; j < NUM; ++j)
 	{
@@ -114,4 +112,15 @@ void *Consumer(void *param)
 	}
 
 	return NULL;
+}
+
+static void CreateThreads(pthread_t *thread, start_routine_t rutine)
+{
+	int status = 0;
+
+	status = pthread_create(thread, NULL, rutine, NULL);
+	while (0 != status)
+	{
+		status = pthread_create(thread, NULL, rutine, NULL);
+	}
 }
