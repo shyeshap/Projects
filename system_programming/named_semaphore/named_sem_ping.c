@@ -35,11 +35,13 @@ int main()
 	while (i < TIMES)
 	{	
 		printf("ping\n");
+
 		status = sem_post(pong);
 		while (status != 0)
 		{
 			sem_post(pong);
 		}
+		
 		status = sem_wait(ping);
 		while (status != 0)
 		{
