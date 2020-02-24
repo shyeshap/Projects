@@ -8,7 +8,9 @@ typedef enum init_status
 	SUCCESS,
 	MEMORY_ALLOC_FAIL,
 	SIGACTION_FAIL,
-	FORK_FAIL
+	FORK_FAIL,
+	SEM_FAIL,
+	PTHREAD_CREATE_FAIL
 } init_status_t;
 
 /* the function recives a pointer to a thread created by the user */
