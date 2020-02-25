@@ -1,15 +1,17 @@
-#include <stdio.h>
-#include <unistd.h>
+#include <stdio.h>	/* printf() */
+#include <stdlib.h> /* atoi() */
+#include <assert.h> /* assert() */
+#include <unistd.h> /* sleep() */
 
-#include "wd.h"
+#include "wd.h" 	/* wd IMP */
 
-int main()
+int main(int argc, char *argv[])
 {
-	init_status_t status = SUCCESS;
+	status_t status = SUCCESS;
 	wd_t *wd = NULL;
-	int time_to_sleep = 60;
-	
-	wd = WDStart("wd_test", &status);
+	int time_to_sleep = 100;
+
+	wd = WDStart(argv[0], &status);
 
 	while(0 < time_to_sleep)
 	{
@@ -17,6 +19,8 @@ int main()
 	}
 
 	WDStop(wd);
+
+	printf("return status: %d\n", status);
 
 	return 0;
 }
