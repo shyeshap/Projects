@@ -7,3 +7,5 @@
 !**.md
 !**.mk
 !makefile
+!**.java
+!**.class
