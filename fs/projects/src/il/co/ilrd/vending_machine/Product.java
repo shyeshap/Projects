@@ -1,4 +1,4 @@
-package VendingMachine;
+package il.co.ilrd.vending_machine;
 
 public enum Product {
 	COLA	(10),
@@ -17,7 +17,5 @@ public enum Product {
 	
 	public int getStock() {return stock;}
 	public double getPrice() {return price;}
-	public void setStock(int fillStock) {stock = fillStock;}
-	public int getKey() {return key;}
-	
+	public void setStock(int fillStock) {stock = fillStock;}	
 }

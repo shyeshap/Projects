@@ -1,4 +1,4 @@
-package VendingMachine;
+package il.co.ilrd.vending_machine;
 
 import static org.junit.jupiter.api.Assertions.*;
 
