@@ -1,3 +1,5 @@
+package il.co.ilrd.intro;
+
 class MySecondClass
 {
 	static void foo1()

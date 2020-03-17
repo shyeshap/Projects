@@ -1,4 +1,4 @@
-package singleton;
+package il.co.ilrd.singleton;
 
 public class Singleton {
 	private static Singleton singleton;

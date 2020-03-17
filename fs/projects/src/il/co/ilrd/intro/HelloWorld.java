@@ -1,3 +1,5 @@
+package il.co.ilrd.intro;
+
 class HelloWorld
 {
 	public static void main(String[] args)

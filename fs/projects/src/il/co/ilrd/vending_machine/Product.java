@@ -9,13 +9,10 @@ public enum Product {
 	SPRITE	(3);
 	
 	private double price;
-	private int stock;
 	
 	private Product(double price) {
 		this.price = price;
 	}
 	
-	public int getStock() {return stock;}
 	public double getPrice() {return price;}
-	public void setStock(int fillStock) {stock = fillStock;}	
 }

@@ -1,4 +1,4 @@
-package InnerClass;
+package il.co.ilrd.inner_class;
 
 public class Outer {
 	
