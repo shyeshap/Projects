@@ -33,6 +33,10 @@ public class Singleton {
             return notLazySingleton;
     }
     
+    //Lazy: we can use static functions and static fields 
+    //without even instantiate the class. 
+    //so if we need to use static functions before we need to istantiate it we will prefer lazy. 
+    
     private static class LazyHolder {
     	static final Singleton INSTANCE = new Singleton();
     }

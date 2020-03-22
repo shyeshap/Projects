@@ -22,9 +22,9 @@ public class Barrier {
 					}
 				}
 								
-				lock.lock();
 				++global;
 				write();
+				lock.lock();
 				written.signalAll();
 				lock.unlock();
 			}
@@ -41,6 +41,7 @@ public class Barrier {
 		public void run() {
 			while (true) {
 				int local = global;
+				
 				lock.lock();
 				sem.release();
 				while (global == local) {
@@ -50,12 +51,12 @@ public class Barrier {
 						e.printStackTrace();
 					}
 				}
-				read();
 				lock.unlock();
+				read();
+				
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
