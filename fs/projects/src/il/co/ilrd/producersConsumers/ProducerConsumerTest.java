@@ -1,4 +1,4 @@
-package producersConsumers;
+package il.co.ilrd.producersConsumers;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -1,4 +1,4 @@
-package producersConsumers;
+package il.co.ilrd.producersConsumers;
 
 import java.util.concurrent.Semaphore;
 
