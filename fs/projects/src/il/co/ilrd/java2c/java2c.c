@@ -4,7 +4,10 @@
 #define UNUSED(x) (void)(x);
 #define RED "\x1b[31m"
 #define RESET "\x1b[0m" 
+
 typedef void (*vfunc_t)(void *);
+typedef char *(*to_string_t)(void *);
+typedef int (*get_num_masters_t)(void *);
 
 typedef enum vMetods{
 	CLONE,
@@ -25,22 +28,22 @@ void objectClone		(void *ptr);
 void objectEquals		(void *ptr);
 void objectFinalize		(void *ptr);
 void objectGetClass		(void *ptr);
-void objectHashCode		(void *ptr);
+size_t objectHashCode	(void *ptr);
 void objectNotify		(void *ptr);
 void objectNotifyAll	(void *ptr);
-void objectToString		(void *ptr);
+char *objectToString	(void *ptr);
 void objectWait			(void *ptr);
 void animalSayHello		(void *ptr);
-void animalGetNumMasters(void *ptr);
-void animalToString		(void *ptr);
+int animalGetNumMasters	(void *ptr);
+char *animalToString	(void *ptr);
 void animalFinalize		(void *ptr);
 void dogSayHello		(void *ptr);
 void dogFinalize		(void *ptr);
-void dogToString		(void *ptr);
+char *dogToString		(void *ptr);
 void catFinalize		(void *ptr);
-void catToString		(void *ptr);
+char *catToString		(void *ptr);
 void catSayHello		(void *ptr);
-void legendaryToString	(void *ptr);
+char *legendaryToString	(void *ptr);
 void legendaryFinalize	(void *ptr);
 void legenderySayHello	(void *ptr);
 
@@ -49,63 +52,63 @@ void legenderySayHello	(void *ptr);
 vfunc_t object_Vtable[] = 		{objectClone,
 	 		         			objectEquals,
 					         	objectGetClass,
-		            			objectHashCode,
+		            			(void(*)(void *))objectHashCode,
 		            			objectNotify,
 		            			objectNotifyAll,
 		            			objectWait,
-		            			objectToString,
+		            			(void(*)(void *))objectToString,
 					            objectFinalize,
 		            			};
 
 vfunc_t animal_Vtable[] = 		{objectClone,
 	 		                	objectEquals,
 					         	objectGetClass,
-		            			objectHashCode,
+		            			(void(*)(void *))objectHashCode,
 		            			objectNotify,
 		            			objectNotifyAll,
 		            			objectWait,
-								animalToString,
+								(void(*)(void *))animalToString,
 								animalFinalize,
-								animalGetNumMasters,
+								(void(*)(void *))animalGetNumMasters,
 								animalSayHello,
 								};
 							
 vfunc_t dog_Vtable[] = 			{objectClone,
 		 		                objectEquals,
 							    objectGetClass,
-				        		objectHashCode,
+				        		(void(*)(void *))objectHashCode,
 				        		objectNotify,
 				        		objectNotifyAll,
 				        		objectWait,
-								dogToString,
+								(void(*)(void *))dogToString,
 								dogFinalize,
-				        		animalGetNumMasters,
+				        		(void(*)(void *))animalGetNumMasters,
 								dogSayHello,
 								};
 						
 vfunc_t cat_Vtable[] = 			{objectClone,
 		 		                objectEquals,
 							    objectGetClass,
-				        		objectHashCode,
+				        		(void(*)(void *))objectHashCode,
 				        		objectNotify,
 				        		objectNotifyAll,
 				        		objectWait,
-								catToString,
+								(void(*)(void *))catToString,
 								catFinalize,
-				        		animalGetNumMasters,
+				        		(void(*)(void *))animalGetNumMasters,
 								animalSayHello
 								};
 
 vfunc_t legendary_Vtable[] = 	{objectClone,
  		                		objectEquals,
 			           			objectGetClass,
-						    	objectHashCode,
+						    	(void(*)(void *))objectHashCode,
 						    	objectNotify,
 						    	objectNotifyAll,
 						    	objectWait,
-						    	legendaryToString,
+						    	(void(*)(void *))legendaryToString,
 						    	legendaryFinalize,
-						    	animalGetNumMasters,
+						    	(void(*)(void *))animalGetNumMasters,
 						    	legenderySayHello,
 						    	};
 						    	
@@ -146,13 +149,6 @@ typedef struct LegendaryAnimal {
 
 int g_animal_counter = 0;
 
-typedef struct Wrapper {
-	object_t *this;
-	int num_masters;
-	char *string_result;
-	size_t hash_code;
-} wrapper_t;
-
 /*******************metadata initialization**********************/
 class_t object_meta = {"Object", sizeof(object_t), NULL, &object_Vtable};
 class_t animal_meta = {"Animal", sizeof(animal_t), &object_meta, &animal_Vtable};
@@ -165,19 +161,17 @@ void animalShowCounter(){
 	printf("%d\n", g_animal_counter);
 }
 
-void java2cFoo(animal_t *animal, wrapper_t param)
+void java2cFoo(animal_t *animal)
 {
-	(*animal->obj.metadata->class_Vtable)[TO_STRING](&param);
-	printf("%s\n", param.string_result);
-	free(param.string_result);
-}
-
-void systemGC()
-{
-
+	char *string_result = NULL;
+	
+	string_result = ((to_string_t)((*animal->obj.metadata->class_Vtable)[TO_STRING]))(animal);
+	printf("%s\n", string_result);
+	free(string_result);
 }
 
 /****************Instance functions implementatin******************/
+/* object funcs */
 void objectClone		(void *ptr) {UNUSED(ptr);}
 void objectEquals		(void *ptr) {UNUSED(ptr);}
 void objectGetClass		(void *ptr) {UNUSED(ptr);}
@@ -185,104 +179,121 @@ void objectNotify		(void *ptr) {UNUSED(ptr);}
 void objectNotifyAll	(void *ptr) {UNUSED(ptr);}
 void objectWait			(void *ptr) {UNUSED(ptr);}
 
-void objectFinalize(void *wrapper) 
+size_t objectHashCode(void *object) 
 {
-	free(((wrapper_t *)wrapper)->this);
+	return (size_t)(object);
 }
 
-void animalFinalize(void *wrapper) 
+char *objectToString(void *object)
 {
-	printf(RED "finalize Animal with ID: %d\n" RESET, 
-			((animal_t *)((wrapper_t *)wrapper)->this)->ID);
-	free(((wrapper_t *)wrapper)->this);
+	char *string_result = (char *)malloc(100);
+	
+	sprintf(string_result, "%s@%lu", 
+			((object_t *)object)->metadata->name, 
+			(size_t)objectHashCode(object));
+	
+	return string_result;
 }
 
-void dogFinalize(void *wrapper) 
+void objectFinalize(void *object) 
 {
-	printf(RED "finalize Dog with ID: %d\n" RESET,
-			((animal_t *)((wrapper_t *)wrapper)->this)->ID);
-	free(((wrapper_t *)wrapper)->this);
+	free(object);
 }
 
-void catFinalize(void *wrapper) 
-{
-	printf(RED "finalize Cat with ID: %d\n" RESET,
-			((animal_t *)((wrapper_t *)wrapper)->this)->ID);
-	free(((wrapper_t *)wrapper)->this);
-}
-
-void legendaryFinalize(void *wrapper) 
-{
-	printf(RED "finalize LegendaryAnimal with ID: %d\n" RESET,
-			((animal_t *)((wrapper_t *)wrapper)->this)->ID);
-	free(((wrapper_t *)wrapper)->this);
-}
-
-void objectHashCode	(void *wrapper) 
-{
-	((wrapper_t *)wrapper)->hash_code = (size_t)(((wrapper_t *)wrapper)->this);
-}
-
-void objectToString(void *wrapper)
-{
-	objectHashCode(wrapper);
-	sprintf(((wrapper_t *)wrapper)->string_result, "%s@%lu", 
-			((object_t *)((wrapper_t *)wrapper)->this)->metadata->name, 
-			((wrapper_t *)wrapper)->hash_code);
-}
-
-void animalSayHello(void *ptr)
+/* Animal funcs */
+void animalSayHello(void *object)
 {
 	printf("Animal Hello!\n");
-	printf("I have %d legs\n", ((animal_t *)((wrapper_t *)ptr)->this)->num_legs);
+	printf("I have %d legs\n", ((animal_t *)(object))->num_legs);
 }
 
-void animalGetNumMasters(void *ptr)
+int animalGetNumMasters(void *object)
 {
-	((wrapper_t *)ptr)->num_masters = 
-							((animal_t *)((wrapper_t *)ptr)->this)->num_masters;
+	return ((animal_t *)object)->num_masters;
 }
 
-void animalToString(void *ptr)
+char *animalToString(void *object)
 {
-	((wrapper_t *)ptr)->string_result = (char *)malloc(100);
-	sprintf(((wrapper_t *)ptr)->string_result, 
-			"Animal with ID: %d", ((animal_t *)((wrapper_t *)ptr)->this)->ID);
+	char *string_result = (char *)malloc(100);
+	
+	sprintf(string_result, "Animal with ID: %d", 
+			((animal_t *)object)->ID);
+	
+	return string_result;
 }
 
-void dogSayHello(void *ptr)
+void animalFinalize(void *object) 
+{
+	printf(RED "finalize Animal with ID: %d\n" RESET, 
+			((animal_t *)object)->ID);
+	free(object);
+}
+
+/* Dog funcs */
+void dogSayHello(void *object)
 {
 	printf("Dog Hello!\n");
-	printf("I have %d legs\n", ((dog_t *)((wrapper_t *)ptr)->this)->num_legs);
+	printf("I have %d legs\n", ((dog_t *)object)->num_legs);
 }
 
-void dogToString(void *ptr)
+char *dogToString(void *object)
 {
-	((wrapper_t *)ptr)->string_result = (char *)malloc(100);
-	sprintf(((wrapper_t *)ptr)->string_result, "Dog with ID: %d", 
-			((dog_t *)((wrapper_t *)ptr)->this)->animal.ID);
+	char *string_result = (char *)malloc(100);
+	
+	sprintf(string_result, "Dog with ID: %d", 
+			((dog_t *)object)->animal.ID);
+	
+	return string_result;
 }
 
-void catToString(void *ptr)
+void dogFinalize(void *object) 
 {
-	((wrapper_t *)ptr)->string_result = (char *)malloc(100);
-	sprintf(((wrapper_t *)ptr)->string_result, "Cat with ID: %d",
-	 		((cat_t *)((wrapper_t *)ptr)->this)->animal.ID);
+	printf(RED "finalize Dog with ID: %d\n" RESET,
+			((animal_t *)object)->ID);
+	free(object);
 }
 
-void legendaryToString(void *ptr)
+/* Cat funcs */
+char *catToString(void *object)
 {
-	((wrapper_t *)ptr)->string_result = (char *)malloc(100);
-	sprintf(((wrapper_t *)ptr)->string_result, "LegendaryAnimal with ID: %d", 
-			((animal_t *)((wrapper_t *)ptr)->this)->ID);
-
+	char *string_result = (char *)malloc(100);
+	
+	sprintf(string_result, "Cat with ID: %d",
+	 		((cat_t *)object)->animal.ID);
+	 
+	return string_result;
 }
 
-void legenderySayHello(void *ptr)
+void catFinalize(void *object) 
 {
-	UNUSED(ptr);
+	printf(RED "finalize Cat with ID: %d\n" RESET,
+			((animal_t *)object)->ID);
+	free(object);
+}
+
+/* LegendaryAnimal funcs */
+char *legendaryToString(void *object)
+{
+	char *string_result = (char *)malloc(100);
+	
+	sprintf(string_result, "LegendaryAnimal with ID: %d", 
+			((animal_t *)object)->ID);
+			
+	return string_result;
+}
+
+void legenderySayHello(void *object)
+{
+	UNUSED(object);
 	
 	printf("Legendary Hello!\n");
+}
+
+void legendaryFinalize(void *object) 
+{
+	printf(RED "finalize LegendaryAnimal with ID: %d\n" RESET,
+			((animal_t *)object)->ID);
+	free(object);
 }
 
 /**************************new*********************************/
@@ -296,10 +307,11 @@ object_t *objectAlloc(class_t *class)
 
 /**********************constructors****************************/
 /* for default constructor insert NULL in num_masters */
-void animalCtor(wrapper_t param, int *num_masters)
+void animalCtor(object_t *object, int *num_masters)
 {
-	animal_t *animal = (animal_t *)(param.this);
+	animal_t *animal = (animal_t *)object;
 	static int flag = 0;
+	char *string_result = NULL;
 	
 	if (0 == flag)
 	{
@@ -319,13 +331,15 @@ void animalCtor(wrapper_t param, int *num_masters)
 	{
 		printf("Animal Ctor\n");
 		animal->num_masters = 1;
-		(*animal->obj.metadata->class_Vtable)[SAY_HELLO](&param);
+		(*animal->obj.metadata->class_Vtable)[SAY_HELLO](animal);
 		animalShowCounter(NULL);
-		(*animal->obj.metadata->class_Vtable)[TO_STRING](&param);
-		printf("%s\n", param.string_result);
-		objectToString(&param);
-		printf("%s\n", param.string_result);
-		free(param.string_result);
+		string_result = ((to_string_t)
+					((*animal->obj.metadata->class_Vtable)[TO_STRING]))(animal);
+		printf ("%s\n", string_result);
+		free(string_result);
+		string_result = objectToString(animal);
+		printf("%s\n", string_result);
+		free(string_result);
 	}
 	
 	else 
@@ -335,9 +349,9 @@ void animalCtor(wrapper_t param, int *num_masters)
 	}
 }
 
-void dogCtor(wrapper_t param)
+void dogCtor(object_t *object)
 {
-	dog_t *dog = (dog_t *)(param.this);
+	dog_t *dog = (dog_t *)object;
 	int i = 2;
 	static int flag = 0;
 	
@@ -347,7 +361,7 @@ void dogCtor(wrapper_t param)
 		++flag;
 	}
 
-	animalCtor(param, &i);
+	animalCtor(object, &i);
 	
 	{
 		printf("Instance initialization block Dog\n");
@@ -359,9 +373,9 @@ void dogCtor(wrapper_t param)
 }
 
 /* for default constructor insert NULL in colors */
-void catCtor(wrapper_t param, char *colors)
+void catCtor(object_t *object, char *colors)
 {
-	cat_t *cat = (cat_t *)(param.this);
+	cat_t *cat = (cat_t *)object;
 	static int flag = 0;
 
 	cat->num_masters = 5;
@@ -374,21 +388,21 @@ void catCtor(wrapper_t param, char *colors)
 	
 	if (colors == NULL)
 	{
-		catCtor(param, "black");
+		catCtor(object, "black");
 		cat->num_masters = 2;
 		printf("Cat Ctor\n");
 	}
 	
 	else
 	{
-		animalCtor(param, NULL);
+		animalCtor(object, NULL);
 		
 		cat->colors = colors;
 		printf("Cat Ctor with color: %s\n", colors);
 	}
 }
 
-void legendaryCtor(wrapper_t param)
+void legendaryCtor(object_t *object)
 {
 	static int flag = 0;
 
@@ -398,7 +412,7 @@ void legendaryCtor(wrapper_t param)
 		++flag;
 	}
 	
-	catCtor(param, NULL);
+	catCtor(object, NULL);
 	
 	printf("Legendary Ctor\n");
 }
@@ -407,93 +421,66 @@ void legendaryCtor(wrapper_t param)
 int main()
 {   
     animal_t *array[5] = {0};
-    wrapper_t param_array[5] = {0};
-    int i = 0;
-    
-    wrapper_t param_animal;
-    wrapper_t param_dog;
-    wrapper_t param_cat;
-    wrapper_t param_legendary;
-    wrapper_t param_cat_color;
-    
-    animal_t *animal;
-    dog_t *dog;
-    cat_t *cat;
-    legendary_t *legendary;
-    cat_t *cat_color;
-    
-    animal = (animal_t *)objectAlloc(&animal_meta);
-	dog = (dog_t *)objectAlloc(&dog_meta);
-	cat = (cat_t *)objectAlloc(&cat_meta);
-	legendary = (legendary_t *)objectAlloc(&legendary_meta);
 
-    param_animal.this = (object_t *)animal;
-    param_dog.this = (object_t *)dog;
-	param_cat.this = (object_t *)cat;
-	param_legendary.this = (object_t *)legendary;
+    int i = 0;
+	
+	object_t *cat_color = NULL;
+    object_t *animal = objectAlloc(&animal_meta);
+	object_t *dog = objectAlloc(&dog_meta);
+	object_t *cat = objectAlloc(&cat_meta);
+	object_t *legendary = objectAlloc(&legendary_meta);
     
-    animalCtor(param_animal, NULL);
-   	dogCtor(param_dog);
-    catCtor(param_cat, NULL);
-    legendaryCtor(param_legendary);
+    animalCtor(animal, NULL);
+   	dogCtor(dog);
+    catCtor(cat, NULL);
+    legendaryCtor(legendary);
    
    	animalShowCounter();
    	
-   	printf("%d\n", animal->ID);
-	printf("%d\n", dog->animal.ID);
-	printf("%d\n", cat->animal.ID);
-	printf("%d\n", legendary->cat.animal.ID);
+   	printf("%d\n", ((animal_t *)animal)->ID);
+	printf("%d\n", ((dog_t *)dog)->animal.ID);
+	printf("%d\n", ((cat_t *)cat)->animal.ID);
+	printf("%d\n", ((legendary_t *)legendary)->cat.animal.ID);
 	
 	free(animal);
 	free(dog);
 	free(cat);
 	free(legendary);
 	
-	dog = (dog_t *)objectAlloc(&dog_meta);
-	cat = (cat_t *)objectAlloc(&cat_meta);
-	cat_color = (cat_t *)objectAlloc(&cat_meta);
-	legendary = (legendary_t *)objectAlloc(&legendary_meta);
-	animal = (animal_t *)objectAlloc(&animal_meta);
+	dog = objectAlloc(&dog_meta);
+	cat = objectAlloc(&cat_meta);
+	cat_color = objectAlloc(&cat_meta);
+	legendary = objectAlloc(&legendary_meta);
+	animal = objectAlloc(&animal_meta);
 	
-	param_dog.this = (object_t *)dog;
-	param_cat.this = (object_t *)cat;
-	param_cat_color.this = (object_t *)cat_color;
-	param_legendary.this = (object_t *)legendary;
-	param_animal.this = (object_t *)animal;
-	
-    dogCtor(param_dog);
-    catCtor(param_cat, NULL);
-    catCtor(param_cat_color, "white");
-    legendaryCtor(param_legendary);
-	animalCtor(param_animal, NULL);
+    dogCtor(dog);
+    catCtor(cat, NULL);
+    catCtor(cat_color, "white");
+    legendaryCtor(legendary);
+	animalCtor(animal, NULL);
 	
  	array[0] = (animal_t *)dog;
 	array[1] = (animal_t *)cat;
 	array[2] = (animal_t *)cat_color;
 	array[3] = (animal_t *)legendary;
-	array[4] = animal;
-
-	param_array[0] = param_dog;
-	param_array[1] = param_cat;
-	param_array[2] = param_cat_color;
-	param_array[3] = param_legendary;
-	param_array[4] = param_animal;
+	array[4] = (animal_t *)animal;
 	
 	for (i = 0; i < 5; ++i)
 	{
-		(*array[i]->obj.metadata->class_Vtable)[SAY_HELLO](&param_array[i]);
-		(*array[i]->obj.metadata->class_Vtable)[NUM_MASTERS](&param_array[i]);
-		printf("%d\n", param_array[i].num_masters);
+		(*array[i]->obj.metadata->class_Vtable)[SAY_HELLO](&array[i]);
+		printf("%d\n", ((get_num_masters_t)
+			((*array[i]->obj.metadata->class_Vtable)[NUM_MASTERS]))(array[i]));
 	}
 	
 	for (i = 0; i < 5; ++i)
 	{
-		java2cFoo(array[i], param_array[i]);
+		java2cFoo(array[i]);
 	}
 	
+	/* GC */
 	for (i = 0; i < 5; ++i)
 	{
-		(*array[i]->obj.metadata->class_Vtable)[FINALIZE](&param_array[i]);
+		(*array[i]->obj.metadata->class_Vtable)[FINALIZE](array[i]);
 	}
 	
     return 0;
