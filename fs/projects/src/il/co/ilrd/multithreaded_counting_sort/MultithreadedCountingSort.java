@@ -30,14 +30,15 @@ public class MultithreadedCountingSort {
 
 	private static char[] sort() {
 		char[] output = new char[arr.length];
-//		System.out.println(arr.length);
+
 		for (int i = 0; i < ascii; ++i) {
-			for (int j = 0; j < histograma[i]; --j)
+			for (int j = 0; j < histograma[i]; ++j)
 			{
+				System.out.println(histograma[i] + j - 1);
 				output[histograma[i] + j - 1] = (char)i;
 			}
 		}
-		
+				
 		return output;
 	}
 	

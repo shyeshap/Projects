@@ -200,113 +200,8 @@ void objectFinalize(void *object)
 	free(object);
 }
 
-/* Animal funcs */
-void animalSayHello(void *object)
-{
-	printf("Animal Hello!\n");
-	printf("I have %d legs\n", ((animal_t *)(object))->num_legs);
-}
-
-int animalGetNumMasters(void *object)
-{
-	return ((animal_t *)object)->num_masters;
-}
-
-char *animalToString(void *object)
-{
-	char *string_result = (char *)malloc(100);
-	
-	sprintf(string_result, "Animal with ID: %d", 
-			((animal_t *)object)->ID);
-	
-	return string_result;
-}
-
-void animalFinalize(void *object) 
-{
-	printf(RED "finalize Animal with ID: %d\n" RESET, 
-			((animal_t *)object)->ID);
-	free(object);
-}
-
-/* Dog funcs */
-void dogSayHello(void *object)
-{
-	printf("Dog Hello!\n");
-	printf("I have %d legs\n", ((dog_t *)object)->num_legs);
-}
-
-char *dogToString(void *object)
-{
-	char *string_result = (char *)malloc(100);
-	
-	sprintf(string_result, "Dog with ID: %d", 
-			((dog_t *)object)->animal.ID);
-	
-	return string_result;
-}
-
-void dogFinalize(void *object) 
-{
-	printf(RED "finalize Dog with ID: %d\n" RESET,
-			((animal_t *)object)->ID);
-	free(object);
-}
-
-/* Cat funcs */
-char *catToString(void *object)
-{
-	char *string_result = (char *)malloc(100);
-	
-	sprintf(string_result, "Cat with ID: %d",
-	 		((cat_t *)object)->animal.ID);
-	 
-	return string_result;
-}
-
-void catFinalize(void *object) 
-{
-	printf(RED "finalize Cat with ID: %d\n" RESET,
-			((animal_t *)object)->ID);
-	free(object);
-}
-
-/* LegendaryAnimal funcs */
-char *legendaryToString(void *object)
-{
-	char *string_result = (char *)malloc(100);
-	
-	sprintf(string_result, "LegendaryAnimal with ID: %d", 
-			((animal_t *)object)->ID);
-			
-	return string_result;
-}
-
-void legenderySayHello(void *object)
-{
-	UNUSED(object);
-	
-	printf("Legendary Hello!\n");
-}
-
-void legendaryFinalize(void *object) 
-{
-	printf(RED "finalize LegendaryAnimal with ID: %d\n" RESET,
-			((animal_t *)object)->ID);
-	free(object);
-}
-
-/**************************new*********************************/
-object_t *objectAlloc(class_t *class)
-{
-	object_t *obj = (object_t *)malloc(class->size);
-	obj->metadata = class;
-	
-	return obj;
-}
-
-/**********************constructors****************************/
-/* for default constructor insert NULL in num_masters */
+/*************************Animal*****************************/
+/* CONSTRUCTOR: for default constructor insert NULL in num_masters */
 void animalCtor(object_t *object, int *num_masters)
 {
 	animal_t *animal = (animal_t *)object;
@@ -349,6 +244,37 @@ void animalCtor(object_t *object, int *num_masters)
 	}
 }
 
+/* funcs */
+void animalSayHello(void *object)
+{
+	printf("Animal Hello!\n");
+	printf("I have %d legs\n", ((animal_t *)(object))->num_legs);
+}
+
+int animalGetNumMasters(void *object)
+{
+	return ((animal_t *)object)->num_masters;
+}
+
+char *animalToString(void *object)
+{
+	char *string_result = (char *)malloc(100);
+	
+	sprintf(string_result, "Animal with ID: %d", 
+			((animal_t *)object)->ID);
+	
+	return string_result;
+}
+
+void animalFinalize(void *object) 
+{
+	printf(RED "finalize Animal with ID: %d\n" RESET, 
+			((animal_t *)object)->ID);
+	object_Vtable[FINALIZE](object);
+}
+
+/***************************Dog******************************/
+/* CONSTRUCTOR */
 void dogCtor(object_t *object)
 {
 	dog_t *dog = (dog_t *)object;
@@ -372,7 +298,32 @@ void dogCtor(object_t *object)
 	dog->num_legs = 4;
 }
 
-/* for default constructor insert NULL in colors */
+/* funcs */
+void dogSayHello(void *object)
+{
+	printf("Dog Hello!\n");
+	printf("I have %d legs\n", ((dog_t *)object)->num_legs);
+}
+
+char *dogToString(void *object)
+{
+	char *string_result = (char *)malloc(100);
+	
+	sprintf(string_result, "Dog with ID: %d", 
+			((dog_t *)object)->animal.ID);
+	
+	return string_result;
+}
+
+void dogFinalize(void *object) 
+{
+	printf(RED "finalize Dog with ID: %d\n" RESET,
+			((animal_t *)object)->ID);
+	object_Vtable[FINALIZE](object);
+}
+
+/*************************Cat***************************/
+/* CONSTRUCTOR: for default constructor insert NULL in colors */
 void catCtor(object_t *object, char *colors)
 {
 	cat_t *cat = (cat_t *)object;
@@ -402,6 +353,26 @@ void catCtor(object_t *object, char *colors)
 	}
 }
 
+/* funcs */
+char *catToString(void *object)
+{
+	char *string_result = (char *)malloc(100);
+	
+	sprintf(string_result, "Cat with ID: %d",
+	 		((cat_t *)object)->animal.ID);
+	 
+	return string_result;
+}
+
+void catFinalize(void *object) 
+{
+	printf(RED "finalize Cat with ID: %d\n" RESET,
+			((animal_t *)object)->ID);
+	object_Vtable[FINALIZE](object);
+}
+
+/*************************LegendaryAnimal**********************8*/
+/* CONSTRUCTOR */
 void legendaryCtor(object_t *object)
 {
 	static int flag = 0;
@@ -415,6 +386,40 @@ void legendaryCtor(object_t *object)
 	catCtor(object, NULL);
 	
 	printf("Legendary Ctor\n");
+}
+
+/* funcs */
+char *legendaryToString(void *object)
+{
+	char *string_result = (char *)malloc(100);
+	
+	sprintf(string_result, "LegendaryAnimal with ID: %d", 
+			((animal_t *)object)->ID);
+			
+	return string_result;
+}
+
+void legenderySayHello(void *object)
+{
+	UNUSED(object);
+	
+	printf("Legendary Hello!\n");
+}
+
+void legendaryFinalize(void *object) 
+{
+	printf(RED "finalize LegendaryAnimal with ID: %d\n" RESET,
+			((animal_t *)object)->ID);
+	object_Vtable[FINALIZE](object);
+}
+
+/**************************new*********************************/
+object_t *objectAlloc(class_t *class)
+{
+	object_t *obj = (object_t *)malloc(class->size);
+	obj->metadata = class;
+	
+	return obj;
 }
 
 /**************************Main***************************/

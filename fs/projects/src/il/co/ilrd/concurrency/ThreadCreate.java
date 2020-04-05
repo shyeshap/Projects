@@ -2,7 +2,7 @@ package il.co.ilrd.concurrency;
 
 public class ThreadCreate {
 	
-	public static class ThreadImpRunnable implements Runnable{
+	/*public static class ThreadImpRunnable implements Runnable{
 		@Override
 		public void run() {
 			System.out.println("thread implemnts runnable");
@@ -24,6 +24,19 @@ public class ThreadCreate {
 		ThreadExtThread thread2 = new ThreadExtThread();
 		thread2.start();
 	}
+*/
+	
+	    public static void main(String[] args) {
+	        System.out.println(func());
+	    }   
+	    
+	    static int x = 5;
+	    
+	    static int func() {
+	        static int x = 10;
+	        
+	        return --ThreadCreate.x;
+	    }
 
 }
 
