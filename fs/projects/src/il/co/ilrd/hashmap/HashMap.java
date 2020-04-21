@@ -21,7 +21,7 @@ public class HashMap<K,V> implements Map<K, V>{
 	private Set<Map.Entry<K, V>> entrySet;
 	private Set<K> keySet;
 	private Collection<V> valueCollection;
-	private int mapModCount = 0;
+	private int MapModCount = 0;
 	
 	public HashMap() {
 		this(DEFAULT_VALUE);
@@ -40,7 +40,7 @@ public class HashMap<K,V> implements Map<K, V>{
 		}
 	}
 	
-	private int getBucket(Object key) {
+	private int getBucketIndx(Object key) {
 		if (key == null) {
 			return 0;
 		}
@@ -49,7 +49,11 @@ public class HashMap<K,V> implements Map<K, V>{
 	}
 	
 	private Pair<K, V> getEntry(Object key){
-		for (Pair<K, V> pair : hashMap.get(getBucket(key))) {
+		if (getBucketIndx(key) < 0) {
+			return null;
+		}
+		
+		for (Pair<K, V> pair : hashMap.get(getBucketIndx(key))) {
 			if (pair.getKey().equals(key)) {
 				return pair;
 			}
@@ -66,12 +70,16 @@ public class HashMap<K,V> implements Map<K, V>{
 			bucket.clear();
 		}
 		
-		++mapModCount;
+		++MapModCount;
 	}
 	
 	@Override
 	public boolean containsKey(Object key) {
-		for (Pair<K, V> pair : hashMap.get(getBucket(key))) {
+		if (getBucketIndx(key) < 0) {
+			return false;
+		}
+		
+		for (Pair<K, V> pair : hashMap.get(getBucketIndx(key))) {
 			if(pair.getKey().equals(key)) {
 				return true;
 			}
@@ -137,7 +145,7 @@ public class HashMap<K,V> implements Map<K, V>{
 			return pair.setValue(value);
 		}
 		
-		hashMap.get(getBucket(key)).add(Pair.of(key, value));
+		hashMap.get(getBucketIndx(key)).add(Pair.of(key, value));
 		
 		return null;
 	}
@@ -147,8 +155,7 @@ public class HashMap<K,V> implements Map<K, V>{
 		for(Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
 			this.put(entry.getKey(),entry.getValue());
 		}
-		
-		++mapModCount;
+
 	}
 
 	@Override
@@ -157,9 +164,8 @@ public class HashMap<K,V> implements Map<K, V>{
 		if (pair == null) {
 			return null;
 		}
-		
-		hashMap.get(getBucket(key)).remove(pair);
-		++mapModCount;
+		hashMap.get(getBucketIndx(key)).remove(pair);
+		++MapModCount;
 
 		return pair.getValue();
 	}
@@ -185,7 +191,7 @@ public class HashMap<K,V> implements Map<K, V>{
 	
 	private class EntrySet extends AbstractSet<Entry<K,V>>{
 		
-		private int modCount = mapModCount;
+		private int modCount = MapModCount;
 		@Override
 		public Iterator<Entry<K,V>> iterator() {
 			return new EntryIterator();
@@ -198,26 +204,26 @@ public class HashMap<K,V> implements Map<K, V>{
 		
 		private class EntryIterator implements Iterator<Entry<K,V>>{
 			
-			Iterator<List<Pair<K, V>>> externalIter = hashMap.iterator();
-			Iterator<Pair<K, V>> internalIter = externalIter.next().iterator();
+			Iterator<List<Pair<K, V>>> bucketIter = hashMap.iterator();
+			Iterator<Pair<K, V>> entryIter = bucketIter.next().iterator();
 			
 			public EntryIterator() {
-				while(!internalIter.hasNext() && externalIter.hasNext()) {
-					internalIter = externalIter.next().iterator();
+				while(!entryIter.hasNext() && bucketIter.hasNext()) {
+					entryIter = bucketIter.next().iterator();
 				}
 			}
 			
 			@Override
 			public boolean hasNext() {
-				return(internalIter.hasNext() || externalIter.hasNext());	
+				return(entryIter.hasNext() || bucketIter.hasNext());	
 			}
 
 			@Override
 			public Entry<K,V> next() {
 				checkIteratorValidation();
-				Map.Entry<K, V> entry = internalIter.next();
-				while(!internalIter.hasNext() && externalIter.hasNext()) {
-					internalIter = externalIter.next().iterator();
+				Map.Entry<K, V> entry = entryIter.next();
+				while(!entryIter.hasNext() && bucketIter.hasNext()) {
+					entryIter = bucketIter.next().iterator();
 				}
 				
 				return entry;
@@ -225,7 +231,7 @@ public class HashMap<K,V> implements Map<K, V>{
 
 	
 			private void checkIteratorValidation() {
-				if (mapModCount != modCount) {
+				if (MapModCount != modCount) {
 					throw (new ConcurrentModificationException());
 				}
 			}
