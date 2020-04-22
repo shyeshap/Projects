@@ -1,4 +1,4 @@
-package il.co.ilrd.hashmap;
+package il.co.ilrd.collection;
 
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
@@ -11,16 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import il.co.ilrd.pair.Pair;
-
 public class HashMap<K,V> implements Map<K, V>{
 
 	private List<List<Pair<K, V>>> hashMap;
 	private final int capacity;
 	private final static int DEFAULT_VALUE = 16; 
-	private Set<Map.Entry<K, V>> entrySet;
-	private Set<K> keySet;
-	private Collection<V> valueCollection;
+
 	private int MapModCount = 0;
 	
 	public HashMap() {
@@ -40,20 +36,12 @@ public class HashMap<K,V> implements Map<K, V>{
 		}
 	}
 	
-	private int getBucketIndx(Object key) {
-		if (key == null) {
-			return 0;
-		}
-		
-		return key.hashCode() % capacity;
+	private List<Pair<K, V>> getBucketIndx(Object key) {
+		return hashMap.get(key == null ? 0 : Math.abs(key.hashCode() % capacity));
 	}
 	
 	private Pair<K, V> getEntry(Object key){
-		if (getBucketIndx(key) < 0) {
-			return null;
-		}
-		
-		for (Pair<K, V> pair : hashMap.get(getBucketIndx(key))) {
+		for (Pair<K, V> pair : getBucketIndx(key)) {
 			if (pair.getKey().equals(key)) {
 				return pair;
 			}
@@ -62,6 +50,14 @@ public class HashMap<K,V> implements Map<K, V>{
 		return null;
 	}
 	
+	private boolean isMatch(Object obj1, Object obj2) {
+		try {
+			return obj1.equals(obj2);
+		}
+		catch(NullPointerException e) {
+			return obj1 == obj2;
+		}
+	}
 	/**********************************************************************************/
 	
 	@Override
@@ -75,12 +71,8 @@ public class HashMap<K,V> implements Map<K, V>{
 	
 	@Override
 	public boolean containsKey(Object key) {
-		if (getBucketIndx(key) < 0) {
-			return false;
-		}
-		
-		for (Pair<K, V> pair : hashMap.get(getBucketIndx(key))) {
-			if(pair.getKey().equals(key)) {
+		for (Pair<K, V> pair : getBucketIndx(key)) { 
+			if (isMatch(pair.getKey(), key)) {
 				return true;
 			}
 		}
@@ -91,7 +83,7 @@ public class HashMap<K,V> implements Map<K, V>{
 	@Override
 	public boolean containsValue(Object value) {
 		for (V v : values()) {
-			if (v.equals(value)) {
+			if (isMatch(v, value)) {
 				return true;
 			}
 		}
@@ -101,11 +93,7 @@ public class HashMap<K,V> implements Map<K, V>{
 
 	@Override
 	public Set<Entry<K, V>> entrySet() {
-		if(null == entrySet) {
-			entrySet = new EntrySet();
-		}
-		
-		return entrySet;
+		return new EntrySet();
 	}
 
 	@Override
@@ -120,22 +108,17 @@ public class HashMap<K,V> implements Map<K, V>{
 
 	@Override
 	public boolean isEmpty() {
-		for (List<Pair<K,V>> bucket : hashMap) {
-			if (!bucket.isEmpty()) {
-				return false;
-			}
-		}
+		if (entrySet().iterator().hasNext()) {
+			System.out.println("in");
+			return false;
+		}		
 		
 		return true;
 	}
 
 	@Override
 	public Set<K> keySet() {
-		if(null == keySet) {
-			keySet = new KeySet();
-		}
-		
-		return keySet;
+		return new KeySet();
 	}
 
 	@Override
@@ -145,7 +128,7 @@ public class HashMap<K,V> implements Map<K, V>{
 			return pair.setValue(value);
 		}
 		
-		hashMap.get(getBucketIndx(key)).add(Pair.of(key, value));
+		getBucketIndx(key).add(Pair.of(key, value));
 		
 		return null;
 	}
@@ -160,15 +143,19 @@ public class HashMap<K,V> implements Map<K, V>{
 
 	@Override
 	public V remove(Object key) {
-		Pair<K, V> pair = getEntry(key);
-		if (pair == null) {
-			return null;
+		List<Pair<K, V>> bucket = getBucketIndx(key);
+		for (Pair<K, V> pair : bucket) {
+			if(isMatch(pair.getKey(), key)) {
+				V value = pair.getValue();
+				bucket.remove(pair);
+				
+				return value;
+			}
 		}
-		hashMap.get(getBucketIndx(key)).remove(pair);
-		++MapModCount;
 
-		return pair.getValue();
+		return null;
 	}
+	
 
 	@Override
 	public int size() {
@@ -182,11 +169,7 @@ public class HashMap<K,V> implements Map<K, V>{
 
 	@Override
 	public Collection<V> values() {
-		if (valueCollection == null) {
-			valueCollection = new ValueCollection();
-		}
-		
-		return valueCollection;
+		return new ValueCollection();
 	}
 	
 	private class EntrySet extends AbstractSet<Entry<K,V>>{

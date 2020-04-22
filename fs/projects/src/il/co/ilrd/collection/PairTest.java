@@ -1,4 +1,4 @@
-package il.co.ilrd.pair;
+package il.co.ilrd.collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 

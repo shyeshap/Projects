@@ -1,4 +1,4 @@
-package il.co.ilrd.hashmap;
+package il.co.ilrd.collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
-import il.co.ilrd.pair.*;
 
 class HashMapTest {
 
 	@Test
 	void testContainsKey() {
 	HashMap<Integer, Integer> hash_Map1 = new HashMap<Integer, Integer>();
+
 	hash_Map1.put(1, 10);
 	hash_Map1.put(2, 20);
 	hash_Map1.put(3, 30);
@@ -158,15 +158,15 @@ class HashMapTest {
 		System.out.println(hash_Map10.keySet());
 		System.out.println(hash_Map10.values());
 		System.out.println(hash_Map10.entrySet());
-		/*
+		
 
 		assertEquals((Integer)999, hash_Map10.remove(null));
 		assertEquals(null, hash_Map10.remove(0));
 		assertEquals(null, hash_Map10.remove(null));
 		assertEquals((Integer)10, hash_Map10.remove(1));
-		assertEquals((Integer)20, hash_Map10.remove(2));*/
+		assertEquals((Integer)20, hash_Map10.remove(2));
 		}
-
-	}
+}
+	
 
 

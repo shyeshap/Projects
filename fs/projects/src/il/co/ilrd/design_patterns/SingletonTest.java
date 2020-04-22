@@ -1,4 +1,4 @@
-package il.co.ilrd.singleton;
+package il.co.ilrd.design_patterns;
 
 import static org.junit.Assert.*;
 import org.junit.jupiter.api.Test;

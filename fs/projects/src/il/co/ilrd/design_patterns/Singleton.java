@@ -1,4 +1,4 @@
-package il.co.ilrd.singleton;
+package il.co.ilrd.design_patterns;
 
 public class Singleton {
 	private static Singleton singleton;

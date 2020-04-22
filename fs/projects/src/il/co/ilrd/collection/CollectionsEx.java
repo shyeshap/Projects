@@ -1,4 +1,4 @@
-package il.co.ilrd.collections;
+package il.co.ilrd.collection;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
