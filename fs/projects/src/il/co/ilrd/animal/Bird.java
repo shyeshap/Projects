@@ -12,7 +12,7 @@ public class Bird extends Animal {
 	
 	@Override
 	public void makeSound() {
-		System.err.println("Squik");
+		System.out.println("Squik");
 	}
 
 }

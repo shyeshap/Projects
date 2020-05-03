@@ -6,7 +6,7 @@ public class VendingMachine {
 	private Monitor monitor;
 	int[] stock;
 	
-	VendingMachine(Monitor monitor, int[] stock) {
+	public VendingMachine(Monitor monitor, int[] stock) {
 		state = State.WAIT_FOR_COIN;
 		this.monitor = monitor;
 		this.stock = stock;

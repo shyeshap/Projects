@@ -1,4 +1,4 @@
-package il.co.ilrd.generic_singly_linked_list;
+package il.co.ilrd.tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,13 +7,14 @@ import java.util.Iterator;
 
 import org.junit.jupiter.api.Test;
 
+import il.co.ilrd.generic_singly_linked_list.EmptyListException;
+import il.co.ilrd.generic_singly_linked_list.SinglyLinkedList;
+
 class SinglyLinkedListTest {
 
 	@Test
 	void intTest() {
 		SinglyLinkedList<Integer> intList = new SinglyLinkedList<>();
-		SinglyLinkedList<Integer> emptyList = new SinglyLinkedList<>();
-		
 		assertTrue(intList.isEmpty());
 		assertEquals(0, intList.size());
 		

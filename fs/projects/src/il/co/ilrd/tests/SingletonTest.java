@@ -1,7 +1,8 @@
-package il.co.ilrd.design_patterns;
+package il.co.ilrd.tests;
 
-import static org.junit.Assert.*;
-import org.junit.jupiter.api.Test;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+import il.co.ilrd.design_patterns.*;
 
 class SingletonTest {
 	

@@ -16,7 +16,6 @@ public class HashMap<K,V> implements Map<K, V>{
 	private List<List<Pair<K, V>>> hashMap;
 	private final int capacity;
 	private final static int DEFAULT_VALUE = 16; 
-
 	private int MapModCount = 0;
 	
 	public HashMap() {

@@ -46,9 +46,3 @@ public class Singleton {
     }
 }
 
-//Using Enum
-//The best way to implement a thread safe Singleton Pattern in Java is using Enum.	
-enum SingletonEnum {
-    INSTANCE;
-}
-

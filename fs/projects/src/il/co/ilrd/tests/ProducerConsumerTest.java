@@ -1,8 +1,8 @@
-package il.co.ilrd.producersConsumers;
-
-import static org.junit.jupiter.api.Assertions.*;
+package il.co.ilrd.tests;
 
 import org.junit.jupiter.api.Test;
+
+import il.co.ilrd.producersConsumers.SemPingPong;
 
 class ProducerConsumerTest {
 

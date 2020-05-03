@@ -1,10 +1,12 @@
-package il.co.ilrd.collection;
+package il.co.ilrd.tests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Comparator;
 
 import org.junit.jupiter.api.Test;
+
+import il.co.ilrd.collection.Pair;
 
 class PairTest {
 
