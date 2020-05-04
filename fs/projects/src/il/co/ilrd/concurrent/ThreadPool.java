@@ -2,23 +2,32 @@ package il.co.ilrd.concurrent;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import il.co.ilrd.collection.WaitableQueue;
 
+/**
+ * non thread-safe ThreadPool
+ * 
+ * @author Shye Shapira
+ *
+ */
 public class ThreadPool {
 
 	private int totalThreadsNum;
 	private int pausedThreadsNum;
 	private WaitableQueue<Task<?>> taskQueue = new WaitableQueue<>();
-	private BlockingQueue<WorkerThread> endedThreads = new LinkedBlockingQueue<>();
-	private volatile boolean poolRunning = true;
+	private BlockingQueue<WorkerThread> endedThreads;
+	private boolean poolRunning = true;
 	private Semaphore sem = new Semaphore(0);
 
 	public ThreadPool(int totalThreadsNum) {
@@ -46,18 +55,23 @@ public class ThreadPool {
 
 	private void initThreads(int threadNum) {
 		for (int i = 0; i < threadNum; ++i) {
-			new WorkerThread().start();
+			new WorkerThread(taskQueue).start();
 		}
 	}
 
-	private class WorkerThread extends Thread{
-		private boolean threadRunning = true;
-
+	private static class WorkerThread extends Thread{
+		private volatile boolean threadRunning = true;
+		private WaitableQueue<Task<?>> taskQueue;
+		
+		WorkerThread(WaitableQueue<Task<?>> taskQueue){
+			this.taskQueue = taskQueue;
+		}
+		
 		@Override
 		public void run() {
 			while(threadRunning) {
 				try {
-					taskQueue.dequeue().future.run();
+					taskQueue.dequeue().execute();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -71,41 +85,127 @@ public class ThreadPool {
 
 	private static class Task<T> implements Comparable<Task<T>>{
 		private int priority;
-		private FutureTask<T> future;
+		private FutureTask future;
+		private Callable<T> task;
+		private boolean running = false;
+		private CountDownLatch executedLatch = new CountDownLatch(1);
 
 		private Task(Callable<T> task, int priority) {
 			this.priority = priority;
-			this.future = new FutureTask<>(task);
+			this.task = task;
+			this.future = new FutureTask();
 		}
-
+		
+		private void execute() {
+			if (!future.cancelled) {
+				try {
+					running = true;
+					future.retVal = task.call();
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					future.done = true;
+					executedLatch.countDown();					
+				}
+			}
+		}
+		
 		@Override
 		public int compareTo(Task<T> task) {
 			return task.priority - this.priority;
 		}
-	}
-
-	class killThreads implements Callable<WorkerThread>{
-
-		@Override
-		public WorkerThread call() {
-			WorkerThread wt = (WorkerThread)Thread.currentThread();
-			wt.disable();
-
-			return wt;
-		}
-	}
-
-	class ShutDown implements Runnable{
-
-		@Override
-		public void run() {
-			WorkerThread wt = (new killThreads()).call();
-
-			try {
-				endedThreads.put(wt);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		
+		private class FutureTask implements Future<T>{
+			private T retVal;
+			private boolean cancelled = false;
+			private boolean done = false;
+			
+			/**
+			 * Attempts to cancel execution of this task. This attempt will fail 
+			 * if the task has already started, completed, has already been cancelled, 
+			 * or could not be cancelled for some other reason. If successful, and 
+			 * this task has not started when cancel is called, this task should never run.
+			 * 
+			 * After this method returns, subsequent calls to isDone() will always return 
+			 * true. Subsequent calls to isCancelled() will always return true if this 
+			 * method returned true.
+			 * 
+			 * @param arg - disabled
+			 * @return false if the task could not be cancelled, typically because is 
+			 * already executing; true otherwise 
+			 */
+			@Override
+			public boolean cancel(boolean arg) {
+				if (!running) {
+					cancelled = true;
+					done = true;					
+				}
+				
+				return cancelled;
 			}
+			
+			/**
+			 * Waits if necessary for the computation to complete, and then retrieves its result.
+			 * 
+			 * @return the computed result
+			 * @throws CancellationException - if the computation was cancelled
+			 * @throws ExecutionException - if the computation threw an exception
+			 * @throws InterruptedException - if the current thread was interrupted while waiting
+			 */
+			@Override
+			public T get() throws InterruptedException, ExecutionException {
+				if (isCancelled()) {
+					throw new CancellationException();
+				}
+				
+				executedLatch.await();
+				
+				return retVal;
+			}
+			
+			/**
+			 * Waits if necessary for at most the given time for the computation to complete, 
+			 * and then retrieves its result, if available.
+			 *  
+			 * @param timeout - the maximum time to wait
+			 * @param unit - the time unit of the timeout argument
+			 * @return the computed result
+			 * @throws CancellationException - if the computation was cancelled
+			 * @throws ExecutionException - if the computation threw an exception
+			 * @throws InterruptedException - if the current thread was interrupted while waiting
+			 */
+			@Override
+			public T get(long timeout, TimeUnit unit) 
+					throws InterruptedException, ExecutionException, TimeoutException {
+				if (isCancelled()) {
+					throw new CancellationException();
+				}
+				                                                                                               
+				if (executedLatch.await(timeout, unit)) {
+					throw new TimeoutException();
+				}
+				
+				return retVal;
+			}
+			
+			/**
+			 * Returns true if this task was cancelled before it completed normally.
+			 * 
+			 * @return true if this task completed
+			 */
+			@Override
+			public boolean isCancelled() { return cancelled; }
+			
+			/**
+			 * Returns true if this task completed. Completion may be due to normal 
+			 * termination, an exception, or cancellation -- in all of these cases, 
+			 * this method will return true.
+			 * 
+			 * @return true if this task completed
+			 */
+			@Override
+			public boolean isDone() { return done; }
+			
 		}
 	}
 
@@ -168,14 +268,9 @@ public class ThreadPool {
 	 */
 	public <T> Future<T> submit(Callable<T> task, Priority priority) {
 		if (poolRunning) {
-			try {
-				Task<T> t = new Task<>(task, priority.getPriorityVal());
-				taskQueue.enqueue(t);
-
-				return t.future;
-			} catch(NullPointerException e) {
-				throw new NullPointerException();			
-			}
+			Task<T> t = new Task<>(task, priority.getPriorityVal());
+			taskQueue.enqueue(t);
+			return t.future;
 		}
 		throw new RejectedExecutionException();
 	}
@@ -189,15 +284,18 @@ public class ThreadPool {
 		if (totalThreadsNum < num) {
 			initThreads(num - totalThreadsNum);
 		} else {
+			Task<Object> t = new Task<>(Executors.callable(() -> {
+				((WorkerThread)Thread.currentThread()).disable();
+			}), Priority.HIGH.getPriorityVal() + 1);
+			
 			for (int i = 0; i < totalThreadsNum - num; ++i) {
-				Task<WorkerThread> t = new Task<>(new killThreads(), Priority.HIGH.getPriorityVal() + 1);
 				taskQueue.enqueue(t);
 			}
 		}
 
 		totalThreadsNum = num;
 	}
-
+	
 	/**
 	 * Initiates an orderly shutdown in which previously submitted tasks are executed, 
 	 * but no new tasks will be accepted. Invocation has no additional effect if 
@@ -214,9 +312,15 @@ public class ThreadPool {
 
 	public void shutdown() {	
 		poolRunning = false;
+		endedThreads = new LinkedBlockingQueue<>();
 
+		Task<Object> t = new Task<>(Executors.callable(() -> {
+			WorkerThread wt = (WorkerThread)Thread.currentThread();
+			wt.disable();
+			endedThreads.add(wt);
+		}), Priority.LOW.getPriorityVal() - 1);
+		
 		for (int i = 0; i < totalThreadsNum; ++i) {
-			Task<Object> t = new Task<>(Executors.callable(new ShutDown()), Priority.LOW.getPriorityVal() - 1);
 			taskQueue.enqueue(t);
 		}
 	}
@@ -231,9 +335,11 @@ public class ThreadPool {
 	 * @return true if this executor terminated and false if the timeout elapsed before termination
 	 * @throws InterruptedException - if interrupted while waiting
 	 */
-	public boolean awaitTermination(int timeOut, TimeUnit unit) throws InterruptedException {
+	public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+		long endTime = System.currentTimeMillis() + TimeUnit.MILLISECONDS.convert(timeout, unit);
+		
 		for (int i = 0; i < totalThreadsNum; ++i) {
-			Thread t = endedThreads.poll(timeOut, unit);			
+			Thread t = endedThreads.poll(endTime - System.currentTimeMillis(), TimeUnit.MILLISECONDS);			
 			if (t == null) { return false; }
 
 			t.join();
@@ -248,24 +354,19 @@ public class ThreadPool {
 	 * call resume() to continue
 	 *   
 	 */
-	public void pause() {
-		class Pause implements Runnable{
-
-			@Override
-			public void run() {
-				try {
-					sem.acquire();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+	public void pause() {	
+		Task<Object> t = new Task<>(Executors.callable(() -> {
+			try {
+				sem.acquire();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-		}	
+		}), Priority.HIGH.getPriorityVal() + 1);
 
 		for (int i = 0; i < totalThreadsNum; ++i) {
-			Task<Object> t = new Task<>(Executors.callable(new Pause()), Priority.HIGH.getPriorityVal() + 1);
 			taskQueue.enqueue(t);
-			pausedThreadsNum = totalThreadsNum;
 		}
+		pausedThreadsNum = totalThreadsNum;
 	}
 
 	/**

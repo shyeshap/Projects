@@ -174,6 +174,30 @@ class ThreadPoolTest{
 		System.out.println("finish");
 
 	}
+	
+	@Test
+	void futureTest() {
+		ThreadPool pool = new ThreadPool(10);
+		Callable<String> callable = ()->{
+			System.err.println("The future is here " + Thread.currentThread());
+			assertEquals(1, 1);
+			return "end: " + Thread.currentThread();
+		};
+		Future<String> f = pool.submit(callable);
+		try {
+			System.out.println(f.get());
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			System.out.println(f.get());
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 }
 
 
