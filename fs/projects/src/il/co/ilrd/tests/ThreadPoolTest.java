@@ -178,6 +178,7 @@ class ThreadPoolTest{
 	@Test
 	void futureTest() {
 		ThreadPool pool = new ThreadPool(10);
+		
 		Callable<String> callable = ()->{
 			System.err.println("The future is here " + Thread.currentThread());
 			assertEquals(1, 1);

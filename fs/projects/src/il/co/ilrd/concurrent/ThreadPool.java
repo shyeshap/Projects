@@ -24,6 +24,7 @@ import il.co.ilrd.collection.WaitableQueue;
 public class ThreadPool {
 
 	private int totalThreadsNum;
+	private int maxThreadsNum;
 	private int pausedThreadsNum;
 	private WaitableQueue<Task<?>> taskQueue = new WaitableQueue<>();
 	private BlockingQueue<WorkerThread> endedThreads;
@@ -88,8 +89,7 @@ public class ThreadPool {
 		private FutureTask future;
 		private Callable<T> task;
 		private boolean running = false;
-		private CountDownLatch executedLatch = new CountDownLatch(1);
-
+		
 		private Task(Callable<T> task, int priority) {
 			this.priority = priority;
 			this.task = task;
@@ -102,10 +102,9 @@ public class ThreadPool {
 					running = true;
 					future.retVal = task.call();
 				} catch (Exception e) {
-					e.printStackTrace();
+					future.e = e;
 				} finally {
-					future.done = true;
-					executedLatch.countDown();					
+					future.setResult();				
 				}
 			}
 		}
@@ -119,6 +118,13 @@ public class ThreadPool {
 			private T retVal;
 			private boolean cancelled = false;
 			private boolean done = false;
+			private CountDownLatch waitLatch = new CountDownLatch(1);
+			private Exception e;
+			
+			private void setResult() {
+				done = true;
+				waitLatch.countDown();
+			}
 			
 			/**
 			 * Attempts to cancel execution of this task. This attempt will fail 
@@ -157,8 +163,9 @@ public class ThreadPool {
 				if (isCancelled()) {
 					throw new CancellationException();
 				}
+			//	e.fillInStackTrace();
 				
-				executedLatch.await();
+				waitLatch.await();
 				
 				return retVal;
 			}
@@ -181,7 +188,7 @@ public class ThreadPool {
 					throw new CancellationException();
 				}
 				                                                                                               
-				if (executedLatch.await(timeout, unit)) {
+				if (!waitLatch.await(timeout, unit)) {
 					throw new TimeoutException();
 				}
 				
@@ -282,10 +289,13 @@ public class ThreadPool {
 	 */
 	public void setNumOfThreads(int num) {
 		if (totalThreadsNum < num) {
+			if (maxThreadsNum < num) { maxThreadsNum = num; }
 			initThreads(num - totalThreadsNum);
 		} else {
 			Task<Object> t = new Task<>(Executors.callable(() -> {
-				((WorkerThread)Thread.currentThread()).disable();
+				WorkerThread wt = (WorkerThread)Thread.currentThread();
+				wt.disable();
+				endedThreads.add(wt);
 			}), Priority.HIGH.getPriorityVal() + 1);
 			
 			for (int i = 0; i < totalThreadsNum - num; ++i) {
@@ -314,15 +324,7 @@ public class ThreadPool {
 		poolRunning = false;
 		endedThreads = new LinkedBlockingQueue<>();
 
-		Task<Object> t = new Task<>(Executors.callable(() -> {
-			WorkerThread wt = (WorkerThread)Thread.currentThread();
-			wt.disable();
-			endedThreads.add(wt);
-		}), Priority.LOW.getPriorityVal() - 1);
-		
-		for (int i = 0; i < totalThreadsNum; ++i) {
-			taskQueue.enqueue(t);
-		}
+		setNumOfThreads(0);
 	}
 
 	/**
