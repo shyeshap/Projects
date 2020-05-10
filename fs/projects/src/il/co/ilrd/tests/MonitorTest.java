@@ -3,7 +3,7 @@ package il.co.ilrd.tests;
 import il.co.ilrd.crud.FileMonitor;
 import il.co.ilrd.crud.FileObserver;
 
-class MonitorTest {
+public class MonitorTest {
 
 	public static void main(String[] args) {
 		FileMonitor fm = new FileMonitor("/var/log/syslog");

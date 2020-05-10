@@ -9,7 +9,7 @@ class CrudFile implements GenericCrud<String, Integer> {
 	private Integer noOfLines = 0;
 	private BufferedWriter writer;
 	
-	public CrudFile(String filePath) {
+	CrudFile(String filePath) {
 		try {
 			writer = new BufferedWriter(new FileWriter(filePath, true));
 		} catch (IOException e) {
