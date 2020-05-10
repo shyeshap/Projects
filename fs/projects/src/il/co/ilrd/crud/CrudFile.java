@@ -4,18 +4,15 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class CrudFile implements GenericCrud<String, Integer> {
-
-	String path;
-	Integer noOfLines = 0;
-	BufferedWriter writer;
+class CrudFile implements GenericCrud<String, Integer> {
+	
+	private Integer noOfLines = 0;
+	private BufferedWriter writer;
 	
 	public CrudFile(String filePath) {
-		path = filePath;
 		try {
-			writer = new BufferedWriter(new FileWriter(path, true));
+			writer = new BufferedWriter(new FileWriter(filePath, true));
 		} catch (IOException e) {
-
 			e.printStackTrace();
 		}
 	}
@@ -33,6 +30,7 @@ public class CrudFile implements GenericCrud<String, Integer> {
 			}
 			writer.append(line);
 			writer.newLine();
+			writer.flush();
 			++noOfLines;
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -6,33 +6,34 @@ import java.io.IOException;
 import java.util.Observable;
 
 public class FileMonitor extends Observable {
-	
-	String path;
-	boolean keepMonitoring = true;
-	
-	public <T> FileMonitor(String fileToMonitor){
-		path = fileToMonitor;
-	}
-	
-	public void startMonitor() {
-		Thread t = new Thread(() -> { 
-			String line = null;
-			try (BufferedReader reader = new BufferedReader(new FileReader(path))){			
-				while (keepMonitoring) {
-					if ((line = reader.readLine()) != null ) {
-						setChanged();
-						notifyObservers(line);
-					}
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		});
-		t.start();
-	}
-	
-	public void stopMonitor() {
-		keepMonitoring = false;
-	}
 
+    private String path;
+    private volatile boolean keepMonitoring = true;
+
+    public <T> FileMonitor(String fileToMonitor){
+    	setChanged();
+        notifyObservers(null);
+    	path = fileToMonitor;
+    }
+    
+    public void startMonitor() {
+        Thread t = new Thread(() -> { 
+            String line = null;
+            try (BufferedReader reader = new BufferedReader(new FileReader(path))){
+                while (keepMonitoring) {
+                    if ((line = reader.readLine()) != null ) {
+                        setChanged();
+                        notifyObservers(line);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        t.start();
+    }
+
+    public void stopMonitor() {
+        keepMonitoring = false;
+    }
 }

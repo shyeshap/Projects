@@ -4,11 +4,9 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class FileObserver implements Observer {
-	String fileToReport;
-	GenericCrud<String, Integer> crud;
+	private GenericCrud<String, Integer> crud;
 	
 	public FileObserver(String filePath) {
-		fileToReport = filePath;
 		crud = new CrudFile(filePath);
 	}
 

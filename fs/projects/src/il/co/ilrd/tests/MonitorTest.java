@@ -10,11 +10,10 @@ class MonitorTest {
 		fm.addObserver(new FileObserver("/home/ol81-21/Desktop/txt.txt"));
 		fm.startMonitor();
 		try {
-			Thread.sleep(500000);
+			Thread.sleep(50000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		fm.stopMonitor();
 	}
-
 }
