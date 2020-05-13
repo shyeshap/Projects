@@ -25,7 +25,7 @@ public class Dispatcher<T> {
 		}
 	}
 	
-	public static class Callback <T>{
+	public static class Callback<T> {
 		private Consumer<T> c;
 		private Runnable r;
 		Dispatcher<T> dispatcher;

@@ -9,9 +9,9 @@ class CrudFile implements GenericCrud<String, Integer> {
 	private Integer noOfLines = 0;
 	private BufferedWriter writer;
 	
-	CrudFile(String filePath) {
+	CrudFile(String outputFilePath) {
 		try {
-			writer = new BufferedWriter(new FileWriter(filePath, true));
+			writer = new BufferedWriter(new FileWriter(outputFilePath, true));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -24,15 +24,12 @@ class CrudFile implements GenericCrud<String, Integer> {
 
 	@Override
 	public Integer create(String line) {
-		try { 
-			if (line == null) {
-				close();
-			}
+		try {
 			writer.append(line);
 			writer.newLine();
 			writer.flush();
 			++noOfLines;
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		

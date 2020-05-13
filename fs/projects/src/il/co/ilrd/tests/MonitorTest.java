@@ -7,13 +7,14 @@ public class MonitorTest {
 
 	public static void main(String[] args) {
 		FileMonitor fm = new FileMonitor("/var/log/syslog");
-		fm.addObserver(new FileObserver("/home/ol81-21/Desktop/txt.txt"));
-		fm.startMonitor();
-		try {
-			Thread.sleep(50000);
-		} catch (InterruptedException e) {
+		try (FileObserver fo = new FileObserver("/home/ol81-21/Desktop/txt.txt")) {
+			fm.addObserver(fo);
+			fm.startMonitor();
+			Thread.sleep(10000);
+			fm.stopMonitor();
+			fo.close();
+		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		fm.stopMonitor();
+		} 		
 	}
 }
