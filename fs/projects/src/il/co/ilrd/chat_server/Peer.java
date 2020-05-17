@@ -1,11 +1,14 @@
 package il.co.ilrd.chat_server;
 
+import java.util.List;
+
 public interface Peer {
-	public void sendMessage(String senderName, int groupID, UsrProperties prop, String message);
-	public void sendAddToGRoup(int status);
-	public void sendNewGroupMember(int newUsrID);
-	public void sendLogin(int userID, int... groupID);
-	public void sendCreateGroup(int groupID, int groupName);
-	public void sendLeaveGroup(int status);
+	public void sendMessage(String senderName, Integer groupID, UsrProperties prop, String message);
+	public void sendAddToGRoup(boolean status);
+	public void sendNewGroupMember(Integer groupID, Integer newUsrID);
+	public void sendLogin(Integer userID, List<Integer> groupID);
+	public void sendCreateGroup(Integer groupID, String groupName);
+	public void sendLeaveGroup(boolean status);
+	public void sendGroupMemberLeaft(Integer groupID, Integer newUsrID);
 
 }

@@ -19,13 +19,17 @@ public class ChatClient extends TestCase {
 
 		log("Connecting to Server on port 1111...");
 
-		ArrayList<String> companyDetails = new ArrayList<String>();
+		ArrayList<String> chat = new ArrayList<String>();
 
 		// create a ArrayList with companyName list
-		companyDetails.add("LOG_IN[shyesh@gmail.com][ShyeShu]");
-		companyDetails.add("CREATE_GROUP[123][fs8081]");
-
-		for (String companyName : companyDetails) {
+		chat.add("LOG_IN[shyesh@gmail.com][ShyeShu]");
+		chat.add("CREATE_GROUP[123][fs8081]");
+		chat.add("JOIN_GROUP[123][100]");
+		chat.add("LEAVE_GROUP[123][100]");
+		chat.add("SEND_MSG[123][100][msg]");
+		chat.add("LOG_OUT[]");
+		
+		for (String companyName : chat) {
 
 			byte[] message = new String(companyName).getBytes();
 			ByteBuffer buffer = ByteBuffer.wrap(message);
@@ -35,9 +39,11 @@ public class ChatClient extends TestCase {
 			buffer.clear();
 
 			// wait for 2 seconds before sending next message
-			Thread.sleep(2000);
+			Thread.sleep(5000);
 		}
-		clientChannel.close();
+		
+		
+		
 	}
 
 	private static void log(String str) {
