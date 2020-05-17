@@ -10,6 +10,7 @@ public class PingServer {
 	private static final int PORT = 50000;
 	static boolean flaga = true;
 	private static String str = "PONG";
+	private static char[] buff = new char[1600];
 
 	private static ServerSocket serverSocket;
 	private static Socket clientSocket;
@@ -44,16 +45,15 @@ public class PingServer {
 	    
 	    final DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 	    final DataInputStream in = new DataInputStream(clientSocket.getInputStream());
-	    str = str.length() + str;
-	    int ret = 0;
-
-	    for (int i = 0; i < 3; ++i) {
-	    	int loop = in.read() - 48;
+	    
+	    for (int i = 0; i < 3; ++i) { 	
+	    	int loop = (int)in.readInt();
 	    	for (int j = 0; j < loop; ++j) {
-	    		ret = in.read();
-	    		System.out.print((char)ret);
+	    		buff[j] = (char)in.read();
 	    	}
-	    	System.out.println();
+	    	System.out.println(buff);
+	    	
+	    	out.writeInt(str.length());
 	    	out.writeBytes(str); 
 	    }
 	    

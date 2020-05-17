@@ -11,7 +11,7 @@ public class PingClient
 	private static final int PORT = 50000;
 	private static final String HOST = "localhost";
 	private static String str = "PING";
-	private static byte[] message = new byte[1600];
+	private static char[] buff = new char[1600];
 
 	public static void main(String[] args) throws IOException
 	{
@@ -29,17 +29,16 @@ public class PingClient
 
 		final DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 		final DataInputStream in = new DataInputStream(socket.getInputStream());
-		str = str.length() + str;
-
-		int ret = 0;
+		int len = str.length();
 		for (int i = 0; i < 3; ++i) {
+			out.writeInt(len);
 			out.writeBytes(str);
-			int loop = in.read() - 48;
+			
+			int loop = (int)in.readInt();
 			for (int j = 0; j < loop; ++j) {
-	    		ret = in.read();
-	    		System.out.print((char)ret);
+	    		buff[j] = (char)in.read();
 	    	}
-	    	System.out.println();
+	    	System.out.println(buff);
 		}
 
 		out.close();
