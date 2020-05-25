@@ -22,6 +22,6 @@ public class ChatApp {
 	}
 	
 	public static void main(String[] args) {
-		ChatApp c = new ChatApp("Login");
+		new ChatApp("Login");
 	}
 }

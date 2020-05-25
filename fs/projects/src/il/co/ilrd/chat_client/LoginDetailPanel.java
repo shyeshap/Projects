@@ -1,8 +1,6 @@
 package il.co.ilrd.chat_client;
 
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -51,7 +49,7 @@ public class LoginDetailPanel extends JPanel {
 				}
 				
 				JFrame frame = new MainFrame("ChatApp", client, nameField.getText());
-				frame.setSize(500, 700);
+				frame.setSize(650, 700);
 				frame.setVisible(true);  
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			}
