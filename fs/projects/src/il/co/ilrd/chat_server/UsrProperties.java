@@ -1,5 +1,9 @@
 package il.co.ilrd.chat_server;
 
-public interface UsrProperties {
+import java.awt.Color;
+import java.io.Serializable;
 
+public interface UsrProperties extends Serializable {
+	
+	Color getColor();
 }

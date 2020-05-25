@@ -1,171 +1,148 @@
 package il.co.ilrd.chat_server;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.net.ServerSocket;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-import java.util.Arrays;
+import java.nio.channels.*;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import il.co.ilrd.chat_msg.*;
 
 public class TCPCommunication implements Communication {
-	
-	private ChatServer server;
-	private static int portNum = 11111;
-	private static String host = "localhost";
-	
+
+	public ChatServer server;
+	private int port = 22222;
+	private Selector selector;
+	private ServerSocketChannel serverChannel;
+	private ServerSocket serverSocket;
+	private SocketChannel channel;
+
 	public TCPCommunication(ChatServer server) {
 		this.server = server;
 	}
-	
-	public static void listen() throws IOException {
-		Selector selector;
-		selector = Selector.open();
-		ServerSocketChannel serverSocket = ServerSocketChannel.open();
-		InetSocketAddress socketAddress = new InetSocketAddress(host, portNum);
-		serverSocket.bind(socketAddress);
-		serverSocket.configureBlocking(false);
-		int ops = serverSocket.validOps();
-		SelectionKey key = serverSocket.register(selector, ops);
-		
-		while (true) {
-			System.out.println("Waiting for new connection...");
-			selector.select();
-			Set<SelectionKey> keys = selector.selectedKeys();
-			Iterator<SelectionKey> keyIterator = keys.iterator();
-			
-			while (keyIterator.hasNext()) {
-				SelectionKey myKey = keyIterator.next();
 
-				if (myKey.isAcceptable()) {
-					SocketChannel clientSocket = serverSocket.accept();
-					clientSocket.configureBlocking(false);
-					clientSocket.register(selector, SelectionKey.OP_READ);
-					System.out.println("Connection Accepted: " + clientSocket.getLocalAddress());
-				} else if (myKey.isReadable()) {
-					
-					SocketChannel clientSocket = (SocketChannel) myKey.channel();
-					ByteBuffer buff = ByteBuffer.allocate(256);
-					clientSocket.read(buff);
-					String msg = new String(buff.array()).trim();
- 
-					System.out.println("Message received: " + msg);
-					String op = msg.substring(0,msg.indexOf('['));
-					System.out.println(op);
-					System.out.println(msg.substring(msg.indexOf('[')));
-					ChatOps.valueOf(op).parse(msg.substring(msg.indexOf('[')));
-					
-					if (msg.equals("Crunchify")) {
-						clientSocket.close();
-						System.out.println("It's time to close connection as we got last company name");
-						System.out.println("\nServer will keep running. Try running client again to establish new connection");
-					}				
-				}
-			}
+	{
+		try {
+			selector = Selector.open();
+			serverChannel = ServerSocketChannel.open();
+			serverSocket =  serverChannel.socket();
+			serverSocket.bind(new InetSocketAddress("localhost", port));
+			serverChannel.configureBlocking(false);
+			serverChannel.register(selector, SelectionKey.OP_ACCEPT);
+		} catch (IOException e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace();
 		}
 	}
-	
-	public static void main(String[] args) throws IOException {
-		listen();
+
+	public static void main(String[] args) {
+		new Thread (() -> {new TCPCommunication(new ChatServerHub()).Init(); }).start();
 	}
-	
-	enum ChatOps{
-		LOG_IN 			(1) {
-			@Override
-			public void parse(String str) {
-				String[] arr = str.split("\\[|]");
-				for (String i : arr) {
-					System.out.println(i);
-				}
-			}
-		},
-		CREATE_GROUP 	(2) {
-			@Override
-			public void parse(String str) {
-				// TODO Auto-generated method stub
-				
-			}
-		},
-		JOIN_GROUP 		(3) {
-			@Override
-			public void parse(String str) {
-				// TODO Auto-generated method stub
-				
-			}
-		},
-		LEAVE_GROUP 	(4) {
-			@Override
-			public void parse(String str) {
-				// TODO Auto-generated method stub
-				
-			}
-		},
-		SEND_MSG		(5) {
-			@Override
-			public void parse(String str) {
-				// TODO Auto-generated method stub
-				
-			}
-		};
-		
-		int opNum;
-		
-		private ChatOps(int opNum) {
-			this.opNum = opNum;
-		}
-		
-		public abstract void parse(String str);
-		
-		public int getOpNum() { return opNum; }
-		
-		public static ChatOps getOp(int num) {
-			for (ChatOps op : ChatOps.values()) {
-	            if (op.getOpNum() == num) {
-	                return op;
-	            }
-	        }
-	        return null;
-		}
-	}
-	
+
 	@Override
 	public void Init() {
-		
-		
-	}
-	
-	class SocketPeer implements Peer {
-		private Socket clientSocket = null;
+		while(true) {
 
-		public SocketPeer(Socket clientSocket) {
+			try {
+				selector.select();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			Iterator<SelectionKey> keyIterator = selector.selectedKeys().iterator();
+
+			while(keyIterator.hasNext()) {
+				SelectionKey currentKey = keyIterator.next();
+				if (currentKey.isAcceptable()) {
+					ServerSocketChannel server = (ServerSocketChannel) currentKey.channel();
+					SocketChannel client;
+					try {
+						client = server.accept();
+						client.configureBlocking(false);
+						client.register(selector, SelectionKey.OP_READ);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				else if(currentKey.isReadable()) {
+					channel = (SocketChannel) currentKey.channel();
+					ByteBuffer bb = ByteBuffer.allocate(2048);
+					Request request; 
+					try {
+						if(-1 == channel.read(bb)) {
+							currentKey.cancel(); 
+							keyIterator.remove(); 
+							continue;
+						}
+						ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bb.array()));
+						request = (Request) ois.readObject();
+						request.getOpId().handleMsg(request, channel, this);
+					} catch (IOException | ClassCastException | ClassNotFoundException e) {
+						currentKey.cancel();
+						keyIterator.remove();
+						continue;
+					}
+				}
+				keyIterator.remove(); 
+			}
+		}
+	}
+
+	class SocketPeer implements Peer {
+		private SocketChannel clientSocket = null;
+
+		public SocketPeer(SocketChannel clientSocket) {
 			this.clientSocket = clientSocket;
 		}
-		
+
 		@Override
-		public void sendMessage(String senderName, int groupID, UsrProperties prop, String message) {
-			// TODO Auto-generated method stub	
+		public void responseMessage(int msgID, int userID, String userName, String groupName, UsrProperties prop,
+				String message, Status status) {
+			send(new ResponseSend(msgID, userID, groupName, message, userName, prop, status));
 		}
 
 		@Override
-		public void sendAddToGRoup(int status) {}
+		public void responseJoinGroup(int msgID, int userID, String userName, String groupName, Status status) {
+			send(new ResponseJoinGroup(msgID, userID, groupName, userName, status));
+		}
 
 		@Override
-		public void sendNewGroupMember(int newUsrID) {}
-		
-		@Override
-		public void sendLogin(int userID, int... groupID) {}
-		
-		@Override
-		public void sendCreateGroup(int groupID, int groupName) {}
-		
-		@Override
-		public void sendLeaveGroup(int status) {}
+		public void responseLogin(int msgID, int userID, Set<String> groupNames, Status status) {
+			send(new ResponseLogin(msgID, userID, groupNames, status));
+		}
 
+		@Override
+		public void responseCreateGroup(int msgID, String groupName, Status status) {
+			send(new ResponseCreateGroup(msgID, groupName, status));	
+		}
+
+		@Override
+		public void responseLeaveGroup(int msgID, int userID, String userName, String groupName, Status status) {
+			send(new ResponseLeaveGroup(msgID, userID, groupName, userName, status));		
+		}
+
+		private void send(Response reply) {
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			ObjectOutputStream out;
+			try {
+				out = new ObjectOutputStream(bos);
+				out.writeObject(reply);
+				out.flush();
+				ByteBuffer bb = ByteBuffer.wrap(bos.toByteArray());
+				clientSocket.write(bb);
+			} catch (IOException e) {
+				try {
+					clientSocket.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
 	}
 }
