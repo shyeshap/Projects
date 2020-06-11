@@ -22,6 +22,10 @@ public class TCPCommunication implements Communication {
 	private ServerSocketChannel serverChannel;
 	private ServerSocket serverSocket;
 	private SocketChannel channel;
+<<<<<<< HEAD
+=======
+	private Thread main;
+>>>>>>> d47918d3f7a133ac41ab8c1ddd184079bc741119
 
 	public TCPCommunication(ChatServer server) {
 		this.server = server;
@@ -42,11 +46,21 @@ public class TCPCommunication implements Communication {
 	}
 
 	public static void main(String[] args) {
+<<<<<<< HEAD
 		new Thread (() -> {new TCPCommunication(new ChatServerHub()).Init(); }).start();
 	}
 
 	@Override
 	public void Init() {
+=======
+		TCPCommunication commun = new TCPCommunication(new ChatServerHub());
+		commun.main = new Thread (() -> { commun.Listen(); });
+		commun.main.start();
+	}
+
+	@Override
+	public void Listen() {
+>>>>>>> d47918d3f7a133ac41ab8c1ddd184079bc741119
 		while(true) {
 
 			try {

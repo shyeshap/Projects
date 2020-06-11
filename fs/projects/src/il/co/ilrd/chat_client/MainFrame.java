@@ -14,9 +14,15 @@ public class MainFrame extends JFrame {
 	 */
 	private static final long serialVersionUID = -582593631733082271L;
 	MainDetailPanel panel;
+<<<<<<< HEAD
 	ClientDemo client;
 	
 	public MainFrame(String title, ClientDemo client, String name) {
+=======
+	Client client;
+	
+	public MainFrame(String title, Client client, String name) {
+>>>>>>> d47918d3f7a133ac41ab8c1ddd184079bc741119
 		super(title);
 		this.client = client;
 	
