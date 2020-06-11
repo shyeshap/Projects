@@ -13,9 +13,9 @@ public class LoginFrame extends JFrame {
 	 */
 	private static final long serialVersionUID = -582593631733082271L;
 	LoginDetailPanel panel;
-	ClientDemo client;
+	Client client;
 	
-	public LoginFrame(String title, ClientDemo client) {
+	public LoginFrame(String title, Client client) {
 		super(title);
 		this.client = client;
 		

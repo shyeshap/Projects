@@ -15,14 +15,15 @@ import il.co.ilrd.chat_msg.*;
 import il.co.ilrd.chat_server.Status;
 
 
-public class ClientDemo {
+public class Client {
 	int clientId;
 	Set<String> groups;
 	Socket clientSocket;
+	private boolean flag = true;
 
 	MainDetailPanel panel;
 
-	public ClientDemo(String hostName, int port) {
+	public Client(String hostName, int port) {
 		try {
 			clientSocket = new Socket(hostName, port);
 		} catch (UnknownHostException e) {
@@ -30,11 +31,16 @@ public class ClientDemo {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		response();
+		
+	}
+
+	private void response() {
 
 		Thread responseThread = new Thread(() -> {
 
-			while (true) {
-
+			while (flag) {
 				try {
 					ObjectInputStream ois = new ObjectInputStream(new DataInputStream(clientSocket.getInputStream()));
 					Response rep = (Response) ois.readObject();
@@ -44,6 +50,7 @@ public class ClientDemo {
 				}
 			}
 		});
+		
 		responseThread.start();
 	}
 
@@ -122,14 +129,14 @@ public class ClientDemo {
 	public enum ResponseOps {
 		LOGIN {
 			@Override
-			public void handleResponse(ClientDemo c, Response res, MainDetailPanel panel) {
+			public void handleResponse(Client c, Response res, MainDetailPanel panel) {
 				ResponseLogin resp = (ResponseLogin) res;
 				/*
 				if (!resp.getStatus().equals(Status.SUCCESS)) {
 					panel.printToTextArea(resp.getStatus().toString(), Color.RED);
 					return;
 				}*/
-				
+
 				c.clientId = resp.getUserId();
 				c.groups = resp.getGroups();
 				panel.printToTextArea("welcom to chat hub!", Color.BLUE);
@@ -141,14 +148,14 @@ public class ClientDemo {
 
 		CREATE_GROUP {
 			@Override
-			public void handleResponse(ClientDemo c, Response res, MainDetailPanel panel) {
+			public void handleResponse(Client c, Response res, MainDetailPanel panel) {
 				ResponseCreateGroup resp = (ResponseCreateGroup) res;
-				
+
 				if (!resp.getStatus().equals(Status.SUCCESS)) {
 					panel.printToTextArea(resp.getStatus().toString(), Color.RED);
 					return;
 				}
-				
+
 				String newGroup = resp.getGroupName();
 				c.groups.add(newGroup);
 				panel.addGroup(newGroup);
@@ -159,14 +166,14 @@ public class ClientDemo {
 
 		JOIN_GROUP {
 			@Override
-			public void handleResponse(ClientDemo c, Response res, MainDetailPanel panel) {
+			public void handleResponse(Client c, Response res, MainDetailPanel panel) {
 				ResponseJoinGroup resp = (ResponseJoinGroup) res;
-				
+
 				if (!resp.getStatus().equals(Status.SUCCESS)) {
 					panel.printToTextArea(resp.getStatus().toString(), Color.RED);
 					return;
 				}
-				
+
 				int userId = resp.getUserId();
 				String newGroup = resp.getGroupName();
 				String sender = resp.getSenderName();
@@ -184,9 +191,9 @@ public class ClientDemo {
 		},
 		LEAVE_GROUP {
 			@Override
-			public void handleResponse(ClientDemo c, Response res, MainDetailPanel panel) {
+			public void handleResponse(Client c, Response res, MainDetailPanel panel) {
 				ResponseLeaveGroup resp = (ResponseLeaveGroup) res;
-				
+
 				if (!resp.getStatus().equals(Status.SUCCESS)) {
 					panel.printToTextArea(resp.getStatus().toString(), Color.RED);
 					return;
@@ -208,14 +215,14 @@ public class ClientDemo {
 		},
 		SEND_MSG {
 			@Override
-			public void handleResponse(ClientDemo c, Response res, MainDetailPanel panel) {
+			public void handleResponse(Client c, Response res, MainDetailPanel panel) {
 				ResponseSend resp = (ResponseSend) res;
-				
+
 				if (!resp.getStatus().equals(Status.SUCCESS)) {
 					panel.printToTextArea(resp.getStatus().toString(), Color.RED);
 					return;
 				}
-				
+
 				int userId = resp.getUserId();
 				String group = resp.getGroupName();
 				String sender = resp.getSenderName();
@@ -227,7 +234,7 @@ public class ClientDemo {
 			}
 		};
 
-		public abstract void handleResponse(ClientDemo c, Response res, MainDetailPanel panel);
+		public abstract void handleResponse(Client c, Response res, MainDetailPanel panel);
 	}
 }
 

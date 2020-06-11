@@ -11,13 +11,13 @@ import javax.swing.*;
 
 public class MainDetailPanel extends JPanel {
 	private static final long serialVersionUID = -338415732415014061L;
-	private ClientDemo client;
+	private Client client;
 	private JTextArea textArea;
 	private JList<String> groups;
 	private DefaultListModel<String> demoList;
 	private Dimension size;
 	
-	MainDetailPanel(ClientDemo client) {
+	MainDetailPanel(Client client) {
 		size = getPreferredSize();
 		size.width = 1000;
 		size.height = 1000;

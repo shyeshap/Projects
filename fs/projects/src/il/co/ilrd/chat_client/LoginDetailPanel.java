@@ -17,9 +17,9 @@ public class LoginDetailPanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = -7048977961845005738L;
-	ClientDemo client;
+	Client client;
 	
-	LoginDetailPanel(ClientDemo client) {
+	LoginDetailPanel(Client client) {
 		this.client = client;
 		Dimension size = getPreferredSize();
 		size.width = 500;

@@ -4,9 +4,11 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 public class ChatApp {
+	Client client;
+	
 	public ChatApp(String titel) {
 		
-		ClientDemo client = new ClientDemo("localhost", 22222);
+		client = new Client("localhost", 22222);
 		
 		SwingUtilities.invokeLater(new Runnable() {
 		
@@ -21,6 +23,8 @@ public class ChatApp {
 	}
 	
 	public static void main(String[] args) {
+		
+		
 		new ChatApp("Login");
 	}
 }
