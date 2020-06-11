@@ -1,4 +1,4 @@
-package il.co.ilrd.knapsack;
+package il.co.ilrd.quizzes;
 
 /*
  * Dynamic progranmming:

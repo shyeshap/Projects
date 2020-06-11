@@ -27,7 +27,7 @@ public class ThreadPool {
 	private int maxThreadsNum;
 	private int pausedThreadsNum;
 	private WaitableQueue<Task<?>> taskQueue = new WaitableQueue<>();
-	private BlockingQueue<WorkerThread> endedThreads;
+	private BlockingQueue<WorkerThread> endedThreads = new LinkedBlockingQueue<>();
 	private boolean poolRunning = true;
 	private Semaphore sem = new Semaphore(0);
 
@@ -41,7 +41,7 @@ public class ThreadPool {
 	public enum Priority {
 		LOW	(1),
 		MID	(5),
-		HIGH(10);
+		HIGH	(10);
 
 		private int priorityVal;
 
@@ -322,9 +322,16 @@ public class ThreadPool {
 
 	public void shutdown() {	
 		poolRunning = false;
-		endedThreads = new LinkedBlockingQueue<>();
-
-		setNumOfThreads(0);
+		
+		Task<Object> t = new Task<>(Executors.callable(() -> {
+			WorkerThread wt = (WorkerThread)Thread.currentThread();
+			wt.disable();
+			endedThreads.add(wt);
+		}), Priority.LOW.getPriorityVal() - 1);
+		
+		for (int i = 0; i < totalThreadsNum; ++i) {
+			taskQueue.enqueue(t);
+		}
 	}
 
 	/**
@@ -343,7 +350,7 @@ public class ThreadPool {
 		for (int i = 0; i < totalThreadsNum; ++i) {
 			Thread t = endedThreads.poll(endTime - System.currentTimeMillis(), TimeUnit.MILLISECONDS);			
 			if (t == null) { return false; }
-
+			
 			t.join();
 		}
 

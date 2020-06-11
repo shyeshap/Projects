@@ -5,19 +5,19 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class FileObserver implements AutoCloseable, Observer {
-	private CrudFile crud;
+	private CrudFile crudFile;
 	
 	public FileObserver(String filePath) throws IOException {
-		this.crud = new CrudFile(filePath);
+		this.crudFile = new CrudFile(filePath);
 	}
 
 	@Override
 	public void update(Observable monitor, Object line) {
-		crud.create((String)line);
+		crudFile.create((String)line);
 	}
 	
 	@Override
 	public void close() throws Exception {
-		crud.close();
+		crudFile.close();
 	}
 }

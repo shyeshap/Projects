@@ -27,7 +27,7 @@ public class FileMonitor extends Observable {
     
     public void copyFile(BufferedReader reader) throws IOException {
     	String line = null;
-    	while ((line = reader.readLine()) != null ) {
+    	while ((line = reader.readLine()) != null && keepMonitoring ) {
     		setChanged();
     		notifyObservers(line);  
     	}
@@ -45,7 +45,7 @@ public class FileMonitor extends Observable {
         		while (keepMonitoring) {
         			while ((line = reader.readLine()) != null) {
         				setChanged();
-        				notifyObservers(line);          
+        				notifyObservers(line);       
         			}
         			key = watchService.take();
         			key.pollEvents();
@@ -54,23 +54,22 @@ public class FileMonitor extends Observable {
         	} catch (IOException e) {
         		e.printStackTrace();    
         	}catch (InterruptedException e) {
-
+        		System.err.println("Monitor interrupted");
         	} catch (ClosedWatchServiceException e) {
         		System.err.println("Monitor Closed");
         	}
 
-        });
-        
+        });        
         t.start();
     }
 
     public void stopMonitor() {
     	try {
+    		keepMonitoring = false;
 			watchService.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    	keepMonitoring = false;
     }
 
 
