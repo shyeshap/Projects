@@ -15,6 +15,7 @@ public class HttpGatewayExchange extends HttpExchange {
 
 	@Override
 	public void close() {
+		System.out.println("close http");
 		// TODO Auto-generated method stub
 
 	}
