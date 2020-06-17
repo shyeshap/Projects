@@ -5,12 +5,18 @@ import java.io.OutputStream;
 
 import com.sun.net.httpserver.HttpExchange;
 
-import il.co.ilrd.generic_iot_infrastructure.msg.Response;
-
 public class HttpPeer implements Peer{
-	HttpExchange httpExchange;
+	private HttpExchange httpExchange;
 	
 	public HttpPeer(HttpExchange httpExchange) {
+		this.httpExchange = httpExchange;
+	}
+
+	public HttpExchange getHttpExchange() {
+		return httpExchange;
+	}
+
+	public void setHttpExchange(HttpExchange httpExchange) {
 		this.httpExchange = httpExchange;
 	}
 

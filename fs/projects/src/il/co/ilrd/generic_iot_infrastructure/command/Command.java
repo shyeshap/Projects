@@ -1,8 +1,9 @@
 package il.co.ilrd.generic_iot_infrastructure.command;
 
-import il.co.ilrd.generic_iot_infrastructure.msg.Data;
-import il.co.ilrd.generic_iot_infrastructure.msg.Response;
+import com.google.gson.JsonObject;
+
+import il.co.ilrd.generic_iot_infrastructure.Response;
 
 public interface Command {
-	public Response execute(Data data);
+	public Response execute(JsonObject data);
 }

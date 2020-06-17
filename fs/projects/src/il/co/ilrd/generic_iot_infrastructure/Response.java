@@ -1,4 +1,4 @@
-package il.co.ilrd.generic_iot_infrastructure.msg;
+package il.co.ilrd.generic_iot_infrastructure;
 
 public class Response {
 	private int statusCode;

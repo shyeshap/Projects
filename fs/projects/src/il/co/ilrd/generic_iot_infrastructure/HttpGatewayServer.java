@@ -20,7 +20,6 @@ public class HttpGatewayServer {
 			context.setHandler(new HttpGatewayHandler(tm));
 			server.start();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

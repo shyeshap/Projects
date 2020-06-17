@@ -4,12 +4,12 @@ import com.google.gson.JsonObject;
 
 import il.co.ilrd.generic_iot_infrastructure.Response;
 
-public class CRCommand implements Command {
-	
-	public CRCommand(JsonObject data) {}
+public class EURCommand implements Command {
+	public EURCommand(JsonObject data) {}
 	
 	@Override
 	public Response execute(JsonObject data) {
+		System.out.println("EUR");
 		return new Response(200, "OK");
 	}
 

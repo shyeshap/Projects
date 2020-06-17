@@ -1,19 +1,17 @@
-package il.co.ilrd.generic_iot_infrastructure.msg;
+package il.co.ilrd.generic_iot_infrastructure;
 
-import il.co.ilrd.design_patterns.Factory;
-import il.co.ilrd.generic_iot_infrastructure.Peer;
-import il.co.ilrd.generic_iot_infrastructure.SingletonCommandFactory;
+import com.google.gson.JsonObject;
+
 import il.co.ilrd.generic_iot_infrastructure.command.Command;
 
 public class Task implements Runnable {
 	String key;
-	Data data;
-	private Factory<String, Command, Data> factory;
+	JsonObject data;
 	private Peer peer;
 	
-	public Task(Msg msg, Peer peer) {
-		key = msg.getKey();
-		data = new Data(msg.getData(), msg.getCompany());
+	public Task(String key, JsonObject data, Peer peer) {
+		this.key = key;
+		this.data = data;
 		this.peer = peer;
 	}
 
@@ -21,7 +19,7 @@ public class Task implements Runnable {
 		return key;
 	}
 
-	public Data getData() {
+	public JsonObject getData() {
 		return data;
 	}
 
