@@ -23,12 +23,14 @@ public class BitsPlay {
 
 	int mirrorBits(int a) {
 		int ans = 0;
-		for (int i = 0; i < 16; ++i) {
-			int mask = (int)Math.pow(1, i);
-			ans ^= ((a & mask) << (32 - i)) ^ ((a & (int)Math.pow(1, 31 - i)) >> i);
-		}
-		
-		return ans;
+	
+		for (int i = 0; i < 32; i++) 
+	    { 
+	        if((a & (1 << i)) != 0) {
+	           ans |= 1 << ((32 - 1) - i);  
+	        }
+	   } 
+	    return ans; 
 	}
 	
 	int reverse(int x)
@@ -46,8 +48,7 @@ public class BitsPlay {
 		System.out.println(b.turnOffKthBit(2, 1) == 0);
 		System.out.println(b.turnOffKthBit(3, 0) == 2);
 		
-		b.swap(3, 4);
-		
+			
 		System.out.println(b.toggleKthBit(1, 0) == 0);
 		System.out.println(b.toggleKthBit(6, 2) == 2);
 		System.out.println(b.toggleKthBit(6, 0) == 7);
