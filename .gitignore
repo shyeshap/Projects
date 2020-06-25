@@ -1,4 +1,4 @@
-# ignore all files, exept sorce and header files:
+# ignore all files, exept the folowing:
 *
 !/**/
 !**.c
