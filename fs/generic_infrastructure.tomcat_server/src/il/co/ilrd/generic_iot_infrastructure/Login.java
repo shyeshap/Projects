@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.Key;
 import java.util.Date;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -13,8 +14,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -28,33 +31,27 @@ public class Login extends HttpServlet {
 	public int pub; 
 	private static String SECRET_KEY;
 	private static final long serialVersionUID = 1L;
-	private CompaniesCrud crud = new CompaniesCrud("jdbc:mysql://localhost/GenericIOT", "newuser", "password");;
+	private CompaniesCrud crud;
 	
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public Login() {
-		super();
-		
+        super();
+        System.out.println("comp ctor");
+        try {
+			Class.forName("com.mysql.jdbc.Driver");
+			crud = new CompaniesCrud("jdbc:mysql://localhost/GenericIOT", "root", "ct,h kvmkhj");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("application/json");
-		PrintWriter out = response.getWriter();
-		//createJWT(request.getParameter("id"), request.getParameter("password"), request.getParameter("id"));
-		/*
-		out.println("<HTML>");
-		out.println("<HEAD> <TITLE> LoginPage </TITLE> <HEAD>");
-		out.println("<BODY>");
-		if (values != null) {
-			out.println("<H4> Hello " + values[0] +  "</H4>");
-		} else {
-			out.println("<H4> Hello World </H4>");
-		}
-		out.println("</BODY> </HTML>");*/
+		
 	}
 
 
@@ -64,8 +61,9 @@ public class Login extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
-		
 		String jsonStr = null;
+		HttpSession session;
+		
 		try(BufferedReader reader = request.getReader();){
 			jsonStr = reader.lines().collect(Collectors.joining());
 		} catch (IOException e) {
@@ -76,6 +74,25 @@ public class Login extends HttpServlet {
 		
 		JsonObject record = crud.read(loginDetails.get("email").getAsString());
 		
+		if (record.size() == 0) {
+			System.out.println("client not axist");
+		} else if (!record.get("password").getAsString().equals(loginDetails.get("password").getAsString())) {
+			System.out.println("wrong password");
+		} else {
+			session = request.getSession();
+			session.setMaxInactiveInterval(1800);
+			for (Entry<String, JsonElement> e : record.entrySet()) {
+				System.out.println("key: " + e.getKey());
+				System.out.println("val: " + e.getValue());
+				session.setAttribute(e.getKey(), e.getValue());
+			}
+			System.out.println("logged in");
+			
+		}
+		/*
+	 	HttpSession session = request.getSession();
+		
+		
 		if (record.get("password").getAsString() != loginDetails.get("password").getAsString()) {
 			
 		} else {
@@ -83,7 +100,7 @@ public class Login extends HttpServlet {
 			response.setCharacterEncoding("UTF-8");
 			out.print(record);
 			out.flush();
-		}
+		}*/
 	}
 	/*
 				if(DBCrud.read().equals(user) && password.equals(pwd)){
