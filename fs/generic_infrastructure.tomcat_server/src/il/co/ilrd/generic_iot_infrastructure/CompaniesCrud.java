@@ -5,14 +5,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map.Entry;
-import java.sql.ResultSetMetaData;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 
-public class CompaniesCrud implements IOTCrud {
+public class CompaniesCrud {
 	private Connection connection;
 
 	public CompaniesCrud(String url, String user, String password) {
@@ -24,24 +20,17 @@ public class CompaniesCrud implements IOTCrud {
 		}
 	}
 
-	public JsonObject create(JsonObject comp_reg) {
+	public Status create(CompanyDetails comp) {
 		PreparedStatement stmt = null;
 		try {
-			String sql = "INSERT INTO " +
-					"Companies" +
-					" (company_name, email, password) VALUES ('" + 
-					comp_reg.get("company_name").getAsString() + 
-					"', '" + 
-					comp_reg.get("email").getAsString() +
-					"', '" +
-					comp_reg.get("password").getAsString() +
-					"')";
-			System.out.println(sql);
-			stmt = connection.prepareStatement(sql);
+			stmt = connection.prepareStatement("INSERT INTO Companies (company_name, email, password) VALUES (?, ?, ?)");
+			stmt.setString(1, comp.getCompanyName());
+			stmt.setString(2, comp.getEmail());
+			stmt.setString(3, comp.getPassword());
 			stmt.execute();
 			connection.commit();
 		} catch (MySQLIntegrityConstraintViolationException e2) {
-
+			return Status.EMAIL_ALREADY_IN_USE;
 		} catch (SQLException e) {
 			try {
 				connection.rollback();
@@ -52,30 +41,23 @@ public class CompaniesCrud implements IOTCrud {
 			e.printStackTrace();
 		}
 
-		return null;
+		return Status.OK;
 	}
 
-	public JsonObject read(String key) {
+	public CompanyDetails read(String email) {
 		System.out.println("read");
 		PreparedStatement stmt = null;
-		JsonObject jRecord = null;
+		CompanyDetails comp = null;
 
 		try {
-			String sql = "SELECT * FROM Companies WHERE email = '" + key + "'";
-			stmt = connection.prepareStatement(sql);
-			System.out.println(stmt.toString());
+			stmt = connection.prepareStatement("SELECT * FROM Companies WHERE email = ?");
+			stmt.setString(1, email);
 			ResultSet rs = stmt.executeQuery();
 			connection.commit();
-			jRecord = new JsonObject();
-			ResultSetMetaData meta = rs.getMetaData();
-			if (rs.next()) {
-				int columns = meta.getColumnCount();
-				for (int i = 1; i <= columns; ++i ) {
-					jRecord.addProperty(meta.getColumnName(i), rs.getObject(i).toString());
-				}
-			}
+			comp = CompanyDetails.getCompanyDetails(rs);
+
 		} catch (MySQLIntegrityConstraintViolationException e2) {
-			System.out.println("exception");
+			return null;
 		} catch (SQLException e) {
 			try {
 				connection.rollback();
@@ -86,32 +68,46 @@ public class CompaniesCrud implements IOTCrud {
 			e.printStackTrace();
 		}
 
-		return jRecord;
+		return comp;
 	}
 
-	public void update(String key, JsonObject obj) {
+	public Status update(String email, CompanyDetails comp) {
 		PreparedStatement stmt = null;
+		Status status = Status.OK;
 
-			try {
-				stmt = connection.prepareStatement("UPDATE items SET company_name = ? WHERE email = '" + key.replace("\"", "") + "'");
-				for (Entry<String, JsonElement> e : obj.entrySet()) {
-					System.out.println(e.getKey());
-					System.out.println(e.getValue().toString().replace("\"", ""));
-					//stmt.setString(1, "company_name");
-					stmt.setString(2, e.getValue().toString().replace("\"", ""));
-					System.out.println(stmt.toString());
-					stmt.execute();
-				}
-				connection.commit();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+		try {
+			stmt = connection.prepareStatement("UPDATE Companies SET company_name = ? WHERE email = '" + email + "'");
+			stmt.setString(1, comp.getCompanyName());
+			int changedRows = stmt.executeUpdate();
+			connection.commit();
+			if (changedRows == 0) {
+				status = Status.EMAIL_NOT_FOUND;
 			}
+		} catch (SQLException e1) {
+
+			e1.printStackTrace();
+		}
+
+		return status; 
 	}
 
-	public JsonObject delete(JsonObject key) {
-		// TODO Auto-generated method stub
-		return null;
+	public Status delete(String email) {
+		PreparedStatement stmt = null;
+		Status status = Status.OK;
+
+		try {
+			stmt = connection.prepareStatement("DELETE FROM Companies WHERE email = '" + email + "'");
+			int changedRows = stmt.executeUpdate();
+			connection.commit();
+			if (changedRows == 0) {
+				status = Status.EMAIL_NOT_FOUND;
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+
+		return status; 
 	}
 
 }
+
