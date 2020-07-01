@@ -3,6 +3,7 @@ package il.co.ilrd.generic_iot_infrastructure;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -10,9 +11,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 
 /**
  * Servlet implementation class Companies
@@ -21,6 +26,7 @@ import com.google.gson.JsonParser;
 public class Companies extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private CompaniesCrud crud;
+	private static String SECRET_KEY = "w0eA2VYklxdRfkLafX7fHBcRdlD8TLYSma6qFJCBBlCRjFLIOHe0N73nJlYuZNR";
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -44,15 +50,11 @@ public class Companies extends HttpServlet {
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
 		String jsonStr = null;
-		
-		// get email from token
-		try(BufferedReader reader = request.getReader();){
-			jsonStr = reader.lines().collect(Collectors.joining());
-			JsonObject registerDetails = new JsonParser().parse(jsonStr).getAsJsonObject();
-			CompanyDetails comp = crud.read(registerDetails.get("email").getAsString());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		String token = request.getHeader("token");
+		String email = getEmail(token);
+
+		CompanyDetails comp = crud.read(email);
+
 		
 		out.println(Status.OK.toString());
 	}
@@ -81,7 +83,6 @@ public class Companies extends HttpServlet {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 	
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -112,5 +113,24 @@ public class Companies extends HttpServlet {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private static Claims decodeJWT(String token) {
+		Claims claims;
+        try {
+            claims = Jwts.parser()
+            		.setSigningKey("bigSecret".getBytes("UTF-8"))
+        			.parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            claims = null;
+        }
+        
+        return claims;
+	}
+	
+	public static String getEmail(String token) {
+		System.out.println("token: " + token);
+		return (String)decodeJWT(token).get("email");
 	}
 }

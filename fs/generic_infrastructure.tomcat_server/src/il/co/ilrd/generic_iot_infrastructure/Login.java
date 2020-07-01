@@ -3,9 +3,10 @@ package il.co.ilrd.generic_iot_infrastructure;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.security.Key;
 import java.util.Date;
-import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -18,11 +19,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+
+import java.util.Base64;
 
 /**
  * Servlet implementation class TomcatServer
@@ -30,7 +34,7 @@ import io.jsonwebtoken.*;
 @WebServlet("/login")
 public class Login extends HttpServlet {
 	public int pub; 
-	private static String SECRET_KEY;
+	private static String SECRET_KEY = "w0eA2VYklxdRfkLafX7fHBcRdlD8TLYSma6qFJCBBlCRjFLIOHe0N73nJlYuZNR";
 	private static final long serialVersionUID = 1L;
 	private CompaniesCrud crud;
 
@@ -79,14 +83,13 @@ public class Login extends HttpServlet {
 		} else if (!comp.getPassword().equals(loginDetails.get("password").getAsString())) {
 			out.println(Status.WRONG_PASSWORD.toString());
 		} else {
-			String token = createJWT(comp, 18_000_000);
-			Cookie loginCookie = new Cookie("token", token);
-			//setting cookie to expiry in 30 mins
-			loginCookie.setMaxAge(30*60);
-			response.addCookie(loginCookie);
-			response.sendRedirect("LoginSuccess.jsp");
+			String token = createJWT(comp.getEmail());
+			Cookie JWTCookie = new Cookie("token", token);
+			JWTCookie.setMaxAge(30*60);
+			response.addCookie(JWTCookie);
+			out.println("OK");
+			
 		}
-
 	}
 
 
@@ -104,40 +107,50 @@ public class Login extends HttpServlet {
 		// TODO Auto-generated method stub
 	}
 
-	private static String createJWT(CompanyDetails comp, long ttlMillis) {
-
+	private static String createJWT(String email) {
+		String s = null;
+		try {
+			s = Jwts.builder()
+					//.setSubject("1234567890")
+					//.setId("5c670a74-c8c9-4a21-a000-fd01b65c7773")
+					.setIssuedAt(new Date())
+					.setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(8)))
+					.claim("email", email)
+					.signWith(SignatureAlgorithm.HS256, "bigSecret".getBytes("UTF-8"))
+					.compact();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return s;
+		
+		/*JwtBuilder builder = null;
 		//The JWT signature algorithm we will be using to sign the token
 		SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-
+		
 		long nowMillis = System.currentTimeMillis();
 		Date now = new Date(nowMillis);
-
+		
 		//We will sign our JWT with our ApiKey secret
+		
 		byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(SECRET_KEY);
 		Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 		
-		//Let's set the JWT Claims
-		JwtBuilder builder = Jwts.builder().setId(comp.getEmail())
+		builder = Jwts.builder()
 				.setIssuedAt(now)
 				.setSubject(comp.getEmail())
-				.signWith(signingKey);
+				.signWith(signatureAlgorithm, signingKey);
+		
 		//if it has been specified, let's add the expiration
 		if (ttlMillis > 0) {
 			long expMillis = nowMillis + ttlMillis;
 			Date exp = new Date(expMillis);
 			builder.setExpiration(exp);
-		}  
-
-		System.out.println(builder.toString());
-		//Builds the JWT and serializes it to a compact, URL-safe string
-		return builder.compact();
+		}
+		String compactJWT = builder.compact();
+		//Let's set the JWT Claims
+		return compactJWT;*/
 	}
 
-	private static Claims decodeJWT(String jwt) {
-		//This line will throw an exception if it is not a signed JWS (as expected)
-		Claims claims = Jwts.parser()
-				.setSigningKey(DatatypeConverter.parseBase64Binary(SECRET_KEY))
-				.parseClaimsJws(jwt).getBody();
-		return claims;
-	}
+	
 }
