@@ -3,7 +3,6 @@ package il.co.ilrd.generic_iot_infrastructure;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Enumeration;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -11,7 +10,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.DatatypeConverter;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -26,7 +24,6 @@ import io.jsonwebtoken.Jwts;
 public class Companies extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private CompaniesCrud crud;
-	private static String SECRET_KEY = "w0eA2VYklxdRfkLafX7fHBcRdlD8TLYSma6qFJCBBlCRjFLIOHe0N73nJlYuZNR";
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -39,31 +36,29 @@ public class Companies extends HttpServlet {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
-		System.out.println("get");
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
-		String jsonStr = null;
-		String token = request.getHeader("token");
-		String email = getEmail(token);
-
-		CompanyDetails comp = crud.read(email);
-
 		
-		out.println(Status.OK.toString());
+		String email = Login.getEmail(request.getHeader("token"));
+		if (email == null) { out.println("redirect to login"); return; }
+		
+		CompanyDetails comp = crud.read(email);
+		JsonObject companyJson = comp.toJson();
+		
+		out.println("status: " + Status.OK.toString());
+		out.print(companyJson);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		System.out.println("post");
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
 		String jsonStr = null;
@@ -86,15 +81,17 @@ public class Companies extends HttpServlet {
 	}
 	
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		System.out.println("put");
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
-		//check token
+		String email = Login.getEmail(request.getHeader("token"));
+		
+		if (email == null) { out.println("redirect to login"); return; }
+
 		try(BufferedReader reader = request.getReader();){
 			String jsonStr = reader.lines().collect(Collectors.joining());
 			JsonObject updateDetails = new JsonParser().parse(jsonStr).getAsJsonObject();
 			CompanyDetails comp = CompanyDetails.getCompanyDetails(updateDetails);
-			Status status = crud.update(comp.getEmail(), comp);
+			Status status = crud.update(email, comp);
 			out.println(status.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -102,35 +99,18 @@ public class Companies extends HttpServlet {
 	}
 	
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		System.out.println("delete");
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
-		//check token
+		
+		String token = request.getHeader("token");
+		String email = Login.getEmail(token);
+		if (email == null) { out.println("redirect to login"); return; }
+		
 		try(BufferedReader reader = request.getReader();){
-
-			Status status = crud.delete("itai@itai");
+			Status status = crud.delete(email);
 			out.println(status.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private static Claims decodeJWT(String token) {
-		Claims claims;
-        try {
-            claims = Jwts.parser()
-            		.setSigningKey("bigSecret".getBytes("UTF-8"))
-        			.parseClaimsJws(token)
-                    .getBody();
-        } catch (Exception e) {
-            claims = null;
-        }
-        
-        return claims;
-	}
-	
-	public static String getEmail(String token) {
-		System.out.println("token: " + token);
-		return (String)decodeJWT(token).get("email");
 	}
 }

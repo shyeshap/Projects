@@ -8,5 +8,8 @@
 !**.mk
 !makefile
 !**.java
+!**.css
+!.js
+!.html
 
 /.metadata/

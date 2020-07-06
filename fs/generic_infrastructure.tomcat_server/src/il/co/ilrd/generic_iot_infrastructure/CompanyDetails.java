@@ -1,7 +1,6 @@
 package il.co.ilrd.generic_iot_infrastructure;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import com.google.gson.JsonObject;
@@ -10,9 +9,10 @@ public class CompanyDetails {
 	private int company_id;
 	private String email;
 	private String company_name;
-	private String password;
+	private char[] password;
+	private char[] salt;
 
-	public CompanyDetails() {}
+	private CompanyDetails() {}
 
 	public static CompanyDetails getCompanyDetails(ResultSet companyDetails) {
 		CompanyDetails comp = new CompanyDetails();
@@ -22,7 +22,8 @@ public class CompanyDetails {
 				comp.company_id = companyDetails.getInt("company_id");
 				comp.company_name = companyDetails.getString("company_name");
 				comp.email = companyDetails.getString("email");
-				comp.password = companyDetails.getString("password");
+				comp.password = companyDetails.getString("password").toCharArray();
+				comp.salt = companyDetails.getString("salt").toCharArray();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -34,13 +35,17 @@ public class CompanyDetails {
 
 		comp.company_name = companyDetails.get("company_name").getAsString();
 		comp.email = companyDetails.get("email").getAsString();
-		comp.password = companyDetails.get("password").getAsString();
-
-		if (comp.company_name == null || comp.email == null || comp.password == null) {
-			return null;
-		}
+		comp.password = PasswordEncryptor.hash(companyDetails.get("password").getAsString().toCharArray(), PasswordEncryptor.getNextSalt());
 
 		return comp;
+	}
+
+	public char[] getSalt() {
+		return salt;
+	}
+
+	public void setSalt(char[] salt) {
+		this.salt = salt;
 	}
 
 	public int getId() {
@@ -67,11 +72,19 @@ public class CompanyDetails {
 		this.company_name = company_name;
 	}
 
-	public String getPassword() {
+	public char[] getPassword() {
 		return password;
 	}
 
-	public void setPassword(String password) {
+	public void setPassword(char[] password) {
 		this.password = password;
+	}
+
+	public JsonObject toJson() {
+		JsonObject companyJson = new JsonObject();
+		companyJson.addProperty("company_id", company_id);
+		companyJson.addProperty("email", email);
+		companyJson.addProperty("company_name", company_name);
+		return companyJson;
 	}
 }

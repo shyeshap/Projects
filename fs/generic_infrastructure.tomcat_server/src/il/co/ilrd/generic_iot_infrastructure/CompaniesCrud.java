@@ -10,6 +10,8 @@ import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 
 public class CompaniesCrud {
 	private Connection connection;
+	private String table = "Companies";
+	private String key = "email";
 
 	public CompaniesCrud(String url, String user, String password) {
 		try {
@@ -23,10 +25,11 @@ public class CompaniesCrud {
 	public Status create(CompanyDetails comp) {
 		PreparedStatement stmt = null;
 		try {
-			stmt = connection.prepareStatement("INSERT INTO Companies (company_name, email, password) VALUES (?, ?, ?)");
+			stmt = connection.prepareStatement("INSERT INTO " + table + " (company_name, email, encrypted_password) VALUES (?, ?, ?, ?)");
 			stmt.setString(1, comp.getCompanyName());
 			stmt.setString(2, comp.getEmail());
-			stmt.setString(3, comp.getPassword());
+			stmt.setString(3, comp.getPassword().toString());
+			stmt.setString(4, comp.getSalt().toString());
 			stmt.execute();
 			connection.commit();
 		} catch (MySQLIntegrityConstraintViolationException e2) {
@@ -45,12 +48,11 @@ public class CompaniesCrud {
 	}
 
 	public CompanyDetails read(String email) {
-		System.out.println("read");
 		PreparedStatement stmt = null;
 		CompanyDetails comp = null;
 
 		try {
-			stmt = connection.prepareStatement("SELECT * FROM Companies WHERE email = ?");
+			stmt = connection.prepareStatement("SELECT * FROM " + table + " WHERE " + key + " = ?");
 			stmt.setString(1, email);
 			ResultSet rs = stmt.executeQuery();
 			connection.commit();
@@ -76,7 +78,7 @@ public class CompaniesCrud {
 		Status status = Status.OK;
 
 		try {
-			stmt = connection.prepareStatement("UPDATE Companies SET company_name = ? WHERE email = '" + email + "'");
+			stmt = connection.prepareStatement("UPDATE " + table + " SET company_name = ? WHERE " + key + " = '" + email + "'");
 			stmt.setString(1, comp.getCompanyName());
 			int changedRows = stmt.executeUpdate();
 			connection.commit();
@@ -96,7 +98,7 @@ public class CompaniesCrud {
 		Status status = Status.OK;
 
 		try {
-			stmt = connection.prepareStatement("DELETE FROM Companies WHERE email = '" + email + "'");
+			stmt = connection.prepareStatement("DELETE FROM Companies WHERE " + key + " = '" + email + "'");
 			int changedRows = stmt.executeUpdate();
 			connection.commit();
 			if (changedRows == 0) {
