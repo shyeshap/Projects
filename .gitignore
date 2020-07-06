@@ -9,7 +9,7 @@
 !makefile
 !**.java
 !**.css
-!.js
-!.html
+!**.js
+!**.html
 
 /.metadata/
