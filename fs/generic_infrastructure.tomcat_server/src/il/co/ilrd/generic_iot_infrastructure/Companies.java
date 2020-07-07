@@ -14,9 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-
 /**
  * Servlet implementation class Companies
  */
@@ -57,6 +54,9 @@ public class Companies extends HttpServlet {
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * 
+	 * Register new company to service by saving details to database
+	 * 
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("application/json");
@@ -67,6 +67,7 @@ public class Companies extends HttpServlet {
 			jsonStr = reader.lines().collect(Collectors.joining());
 			JsonObject registerDetails = new JsonParser().parse(jsonStr).getAsJsonObject();
 			CompanyDetails comp = CompanyDetails.getCompanyDetails(registerDetails);
+			System.out.println("comp: " + comp);
 			if (comp == null) {
 				JsonObject ret = new JsonObject();
 				ret.addProperty("msg", "one of the fields is missing");
@@ -80,6 +81,9 @@ public class Companies extends HttpServlet {
 		}
 	}
 	
+	/**
+	 * change company details in database
+	 */
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
@@ -98,6 +102,9 @@ public class Companies extends HttpServlet {
 		}
 	}
 	
+	/**
+	 * delete company from service by removing it from DB
+	 */
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();

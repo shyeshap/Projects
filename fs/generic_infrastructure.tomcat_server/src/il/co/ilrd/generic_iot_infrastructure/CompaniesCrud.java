@@ -25,11 +25,10 @@ public class CompaniesCrud {
 	public Status create(CompanyDetails comp) {
 		PreparedStatement stmt = null;
 		try {
-			stmt = connection.prepareStatement("INSERT INTO " + table + " (company_name, email, encrypted_password) VALUES (?, ?, ?, ?)");
+			stmt = connection.prepareStatement("INSERT INTO " + table + " (company_name, email, encrypted_password) VALUES (?, ?, ?)");
 			stmt.setString(1, comp.getCompanyName());
 			stmt.setString(2, comp.getEmail());
-			stmt.setString(3, comp.getPassword().toString());
-			stmt.setString(4, comp.getSalt().toString());
+			stmt.setString(3, comp.getPassword());
 			stmt.execute();
 			connection.commit();
 		} catch (MySQLIntegrityConstraintViolationException e2) {

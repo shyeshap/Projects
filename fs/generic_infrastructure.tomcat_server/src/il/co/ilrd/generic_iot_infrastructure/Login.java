@@ -14,7 +14,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -61,7 +60,6 @@ public class Login extends HttpServlet {
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
 		String jsonStr = null;
-		HttpSession session;
 
 		try(BufferedReader reader = request.getReader();){
 			jsonStr = reader.lines().collect(Collectors.joining());
@@ -71,12 +69,13 @@ public class Login extends HttpServlet {
 
 		JsonObject loginDetails = new JsonParser().parse(jsonStr).getAsJsonObject();
 		CompanyDetails comp = crud.read(loginDetails.get("email").getAsString());
+		
+		System.out.println("created password " + loginDetails.get("password").getAsString());
+		System.out.println("expected password " + comp.getPassword());
 
 		if (comp.getEmail() == null) {
 			out.println(Status.EMAIL_NOT_FOUND.toString());
-		} else if (!PasswordEncryptor.isExpectedPassword(loginDetails.get("password").getAsString().toCharArray(), 
-					new String(comp.getSalt()).getBytes(), 
-					new String(comp.getPassword()).getBytes())) {
+		} else if (!PasswordEncryptor.validatePassword(loginDetails.get("password").getAsString(), comp.getPassword())) {
 			out.println(Status.WRONG_PASSWORD.toString());
 			return;
 		} else {
@@ -88,7 +87,6 @@ public class Login extends HttpServlet {
 			
 		}
 	}
-
 
 	/**
 	 * @see HttpServlet#doPut(HttpServletRequest, HttpServletResponse)

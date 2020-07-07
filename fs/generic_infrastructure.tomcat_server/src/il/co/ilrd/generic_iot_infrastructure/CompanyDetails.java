@@ -9,8 +9,7 @@ public class CompanyDetails {
 	private int company_id;
 	private String email;
 	private String company_name;
-	private char[] password;
-	private char[] salt;
+	private String password;
 
 	private CompanyDetails() {}
 
@@ -22,8 +21,7 @@ public class CompanyDetails {
 				comp.company_id = companyDetails.getInt("company_id");
 				comp.company_name = companyDetails.getString("company_name");
 				comp.email = companyDetails.getString("email");
-				comp.password = companyDetails.getString("password").toCharArray();
-				comp.salt = companyDetails.getString("salt").toCharArray();
+				comp.password = companyDetails.getString("encrypted_password");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -32,21 +30,14 @@ public class CompanyDetails {
 	}
 	public static CompanyDetails getCompanyDetails(JsonObject companyDetails) {
 		CompanyDetails comp = new CompanyDetails();
-
+		
 		comp.company_name = companyDetails.get("company_name").getAsString();
 		comp.email = companyDetails.get("email").getAsString();
-		comp.password = PasswordEncryptor.hash(companyDetails.get("password").getAsString().toCharArray(), PasswordEncryptor.getNextSalt());
-
+		comp.password = PasswordEncryptor.generateStorngPasswordHash(companyDetails.get("password").getAsString());
+		
 		return comp;
 	}
 
-	public char[] getSalt() {
-		return salt;
-	}
-
-	public void setSalt(char[] salt) {
-		this.salt = salt;
-	}
 
 	public int getId() {
 		return company_id;
@@ -72,11 +63,11 @@ public class CompanyDetails {
 		this.company_name = company_name;
 	}
 
-	public char[] getPassword() {
+	public String getPassword() {
 		return password;
 	}
 
-	public void setPassword(char[] password) {
+	public void setPassword(String password) {
 		this.password = password;
 	}
 
