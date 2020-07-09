@@ -42,7 +42,7 @@ public class Companies extends HttpServlet {
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
 		
-		String email = Login.getEmail(request.getHeader("token"));
+		String email = TokenManager.getEmail(request.getHeader("token"));
 		if (email == null) { out.println("redirect to login"); return; }
 		
 		CompanyDetails comp = crud.read(email);
@@ -87,7 +87,7 @@ public class Companies extends HttpServlet {
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
-		String email = Login.getEmail(request.getHeader("token"));
+		String email = TokenManager.getEmail(request.getHeader("token"));
 		
 		if (email == null) { out.println("redirect to login"); return; }
 
@@ -105,12 +105,13 @@ public class Companies extends HttpServlet {
 	/**
 	 * delete company from service by removing it from DB
 	 */
+	//FIXME delete all company products
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
 		
 		String token = request.getHeader("token");
-		String email = Login.getEmail(token);
+		String email = TokenManager.getEmail(token);
 		if (email == null) { out.println("redirect to login"); return; }
 		
 		try(BufferedReader reader = request.getReader();){

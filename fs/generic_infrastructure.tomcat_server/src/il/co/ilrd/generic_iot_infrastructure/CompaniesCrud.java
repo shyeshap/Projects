@@ -82,7 +82,7 @@ public class CompaniesCrud {
 			int changedRows = stmt.executeUpdate();
 			connection.commit();
 			if (changedRows == 0) {
-				status = Status.EMAIL_NOT_FOUND;
+				status = Status.INVALID_TOKEN;
 			}
 		} catch (SQLException e1) {
 
@@ -91,7 +91,7 @@ public class CompaniesCrud {
 
 		return status; 
 	}
-
+//FIXME delete all products of company
 	public Status delete(String email) {
 		PreparedStatement stmt = null;
 		Status status = Status.OK;
@@ -101,7 +101,7 @@ public class CompaniesCrud {
 			int changedRows = stmt.executeUpdate();
 			connection.commit();
 			if (changedRows == 0) {
-				status = Status.EMAIL_NOT_FOUND;
+				status = Status.INVALID_TOKEN;
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();

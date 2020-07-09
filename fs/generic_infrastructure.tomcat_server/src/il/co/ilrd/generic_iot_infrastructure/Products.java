@@ -42,9 +42,9 @@ public class Products extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
-		Status status = Status.EMAIL_NOT_FOUND;
+		Status status = Status.INVALID_TOKEN;
 		JsonObject ret = new JsonObject();
-		String email = Login.getEmail(request.getHeader("token"));
+		String email = TokenManager.getEmail(request.getHeader("token"));
 		
 		if (email != null) {
 			JsonArray products = crud.read(email);
@@ -63,8 +63,8 @@ public class Products extends HttpServlet {
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
 		JsonObject ret = new JsonObject();
-		Status status = Status.WRONG_INPUT;
-		String email = Login.getEmail(request.getHeader("token"));
+		Status status = Status.INVALID_TOKEN;
+		String email = TokenManager.getEmail(request.getHeader("token"));
 		
 		try(BufferedReader reader = request.getReader();){
 			String jsonStr = reader.lines().collect(Collectors.joining());
@@ -86,8 +86,8 @@ public class Products extends HttpServlet {
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
-		Status status = Status.EMAIL_NOT_FOUND;
-		String email = Login.getEmail(request.getHeader("token"));
+		Status status = Status.INVALID_TOKEN;
+		String email = TokenManager.getEmail(request.getHeader("token"));
 	
 		if (email != null) { 
 			try(BufferedReader reader = request.getReader();){
@@ -107,8 +107,8 @@ public class Products extends HttpServlet {
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
-		Status status = Status.EMAIL_NOT_FOUND;
-		String email = Login.getEmail(request.getHeader("token"));
+		Status status = Status.INVALID_TOKEN;
+		String email = TokenManager.getEmail(request.getHeader("token"));
 	
 		if (email != null) { 
 			try(BufferedReader reader = request.getReader();){

@@ -32,7 +32,7 @@ public class ProductsCrud {
 			stmt.setString(2, prod.getModel());
 			stmt.execute();
 		} catch (MySQLIntegrityConstraintViolationException e2) {
-			return Status.MODEL_ALREADY_EXIST;
+			return Status.WRONG_INPUT;
 		} catch (SQLException e) {
 			try {
 				connection.rollback();
@@ -54,7 +54,7 @@ public class ProductsCrud {
 			stmt = connection.prepareStatement("SELECT * FROM " + table + " WHERE email = ?");
 			stmt.setString(1, email);
 			ResultSet res = stmt.executeQuery();
-			productsArray = resultSetToJson(res);
+			productsArray = resultSetToJsonArray(res);
 		} catch (MySQLIntegrityConstraintViolationException e2) {
 			return null;
 		} catch (SQLException e) {
@@ -106,7 +106,7 @@ public class ProductsCrud {
 		return status; 
 	}
 
-	private JsonArray resultSetToJson(ResultSet res) throws SQLException {
+	private JsonArray resultSetToJsonArray(ResultSet res) throws SQLException {
 		JsonArray prodactsArr = new JsonArray();
 
 		while (res.next()) {
